@@ -142,14 +142,22 @@ this.session = env.createSession(modelPath, opts);
 
 ---
 
-## 4. Performance Tuning (CPU)
+## 4. Performance Tuning
 
+### CPU Tuning
 | Setting | Recommendation |
 | :--- | :--- |
 | **`IntraOpNumThreads`** | Set to number of physical cores available to the request. Don't oversubscribe. |
 | **`InterOpNumThreads`** | Keep low (1) unless running parallel subgraphs (rare). |
 | **Execution Mode** | `SEQUENTIAL` is usually faster for simple models; `PARALLEL` increases latency but throughput for complex graphs. |
 | **Memory Mapping** | Use `sessionOptions.addSessionConfigEntry("session.load_model_format", "ORT")` for faster loading if using optimized format. |
+
+### GPU Tuning
+| Setting | Recommendation |
+| :--- | :--- |
+| **`cudnn_conv_algo_search`** | Set to `HEURISTIC` (default) or `EXHAUSTIVE` (slower init, faster run) via provider options. |
+| **`gpu_mem_limit`** | Set a hard limit on GPU memory usage if sharing the card with other processes. |
+| **IO Binding** | **Crucial**: Use `run(..., runOptions, ioBinding)` to keep inputs/outputs on device (GPU) and avoid CPU-GPU copies. |
 
 ### Memory Management
 **Critical**: ONNX Runtime uses off-heap memory (C++). 
@@ -158,7 +166,22 @@ this.session = env.createSession(modelPath, opts);
 
 ---
 
-## 5. Architecture Diagram
+## 5. Advanced Topics
+
+### Quantization (INT8)
+Drastically reduce model size and latency with minimal accuracy loss.
+- **Dynamic Quantization**: Weights are INT8, activations quantized on-the-fly (Great for NLP/Transformers).
+- **Static Quantization**: Weights and activations are INT8. Requires a "calibration" dataset to determine ranges (Best for CNNs).
+
+### Execution Providers: CUDA vs TensorRT
+- **CUDA**: General purpose, robust support for most ONNX ops. Fast compilation.
+- **TensorRT**: NVIDIA's specialized optimizer.
+    - **Pros**: Can be ~2-5x faster than basic CUDA execution.
+    - **Cons**: Extremely slow engine build time (minutes on startup), strictly tied to specific GPU architecture. Use for stable, long-running production deployments.
+
+---
+
+## 6. Architecture Diagram
 
 ```mermaid
 graph TD

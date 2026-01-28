@@ -14,6 +14,7 @@ Productionalizing ML models is harder than training them.
 ### [Cheatsheets](notes/cloud-cheatsheet.md)
 Quick references for frequent tasks.
 - **[Cloud Cheatsheet](notes/cloud-cheatsheet.md)**: Common CLI commands and patterns for major cloud providers.
+- **[Zsh Setup](notes/zsh-setup.md)**: Local dev environment (Powerlevel10k, Plugins, SDKMAN).
 
 ## 🚀 About
 Maintained by **Dheeraj Joshi**.

@@ -162,11 +162,11 @@ this.session = env.createSession(modelPath, opts);
 
 ```mermaid
 graph TD
-    subgraph Python[Training Phase (Python)]
+    subgraph Python ["Training Phase (Python)"]
         TF[TensorFlow / PyTorch] -->|Export| ONNX[model.onnx]
     end
 
-    subgraph Java[Serving Phase (JVM)]
+    subgraph Java ["Serving Phase (JVM)"]
         App[Spring Boot / Flink] 
         Runtime[ONNX Runtime (C++)]
         

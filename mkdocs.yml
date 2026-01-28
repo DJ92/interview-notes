@@ -1,6 +1,6 @@
 site_name: DJ | ML Systems & GenAI
 site_description: Notes on ML systems, applied ML, and GenAI
-site_author: DJ
+site_author: Dheeraj Joshi
 
 theme:
   name: material

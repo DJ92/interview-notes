@@ -16,3 +16,4 @@ nav:
   - About: about.md
   - Notes:
     - Cloud Cheatsheet: notes/cloud-cheatsheet.md
+    - MLflow: notes/mlflow-cloud-run.md

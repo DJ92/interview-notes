@@ -24,3 +24,4 @@ nav:
   - Notes:
     - Cloud Cheatsheet: notes/cloud-cheatsheet.md
     - MLflow: notes/mlflow-cloud-run.md
+    - ONNX Java Serving: notes/onnx-java-serving.md

@@ -11,7 +11,7 @@ Productionalizing ML models is harder than training them.
 - **[MLflow on Cloud Run](notes/mlflow-cloud-run.md)**: A serverless, scalable architecture for ML metadata and model registry.
 - **[ONNX Java Serving](notes/onnx-java-serving.md)**: High-performance CPU & GPU inference in Java using ONNX Runtime.
 
-### [Cheatsheets](notes/cloud-cheatsheet.md)
+### [Cheatsheets]
 Quick references for frequent tasks.
 - **[Cloud Cheatsheet](notes/cloud-cheatsheet.md)**: Common CLI commands and patterns for major cloud providers.
 - **[Zsh Setup](notes/zsh-setup.md)**: Local dev environment (Powerlevel10k, Plugins, SDKMAN).

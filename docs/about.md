@@ -1,6 +1,6 @@
 # About Me
 
-I am a Senior Machine Learning & Software Engineer specializing in **large-scale personalization, ranking, and ML platforms**.
+I am a Staff Systems & Machine Learning Engineer specializing in **large-scale personalization, ranking, and ML platforms**. Also, working on agentic AI systems and research on open source LLMs.
 
 Currently, I design and build systems that serve millions of users, focusing on the intersection of theoretical modeling and practical engineering constraints.
 
@@ -25,4 +25,5 @@ I believe in simple, predictable, and observable systems. Complexity should be i
 ## Connect
 
 *   [GitHub](https://github.com/DJ92)
-*   [LinkedIn](#) <!-- Add your LinkedIn URL here -->
+*   [LinkedIn](https://www.linkedin.com/in/joshidheeraj/)
+*   [HuggingFace](https://huggingface.co/Djosh1992)

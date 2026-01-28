@@ -1,15 +1,15 @@
-# DJ's Interview Notes & Engineering Notebook
+# GenAI + ML Systems & Engineering Notebook
 
-This repository contains the source code for my personal knowledge base and engineering notebook.
+This repository contains the knowledge, designs & source code for my personal knowledge base and engineering notebook.
 
 **Live Site:** [https://dj92.github.io/interview-notes](https://dj92.github.io/interview-notes)
 
 ## About
 This project is built with [MkDocs](https://www.mkdocs.org/) and [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/). It serves as a public repository of my thoughts on:
 *   Machine Learning Systems
-*   Applied Modeling
-*   Engineering Tradeoffs
+*   Applied ML
 *   Generative AI
+*   Engineering Tradeoffs
 
 ## Local Development
 

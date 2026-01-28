@@ -185,18 +185,18 @@ Drastically reduce model size and latency with minimal accuracy loss.
 
 ```mermaid
 graph TD
-    subgraph Python ["Training Phase (Python)"]
-        TF["TensorFlow / PyTorch"] -->|Export| ONNX["model.onnx"]
+    subgraph Python ["Training Phase - Python"]
+        TF["TensorFlow / PyTorch"] -->|Export| ModelFile["model.onnx"]
     end
 
-    subgraph Java ["Serving Phase (JVM)"]
-        App["Spring Boot / Flink"] 
-        Runtime["ONNX Runtime (C++)"]
+    subgraph Java ["Serving Phase - JVM"]
+        AppService["Spring Boot / Flink"] 
+        OrtRuntime["ONNX Runtime C++"]
         
-        ONNX -->|Load| Runtime
-        App -- JNI --> Runtime
-        Runtime -- Result --> App
+        ModelFile -->|Load| OrtRuntime
+        AppService -- JNI --> OrtRuntime
+        OrtRuntime -- Result --> AppService
     end
     
-    style Runtime fill:#f9f,stroke:#333
+    style OrtRuntime fill:#f9f,stroke:#333
 ```

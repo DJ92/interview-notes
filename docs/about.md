@@ -22,8 +22,11 @@ Currently, I design and build systems that serve millions of users, focusing on 
 ## Philosophy
 
 > "Learn, build, share."
+>
 > "The best systems are boring."
+>
 > "Leave the codebase better than you found it."
+>
 > "Hard work beats talent when talent doesn't work hard."
 
 I believe in simple, predictable, and observable systems. Complexity should be introduced only when necessary to solve a specific problem, not for its own sake.

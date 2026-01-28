@@ -23,11 +23,11 @@ Rules provide system-level instructions to the Agent. They can be scoped to spec
 
 Skills extend the agent's capabilities by providing it with "tools" (functions) it can call to interact with external systems or perform complex logic.
 
-**Concept**:
+### **Concept**:
 - **Tool Definitions**: JSON schemas defining the function signature (name, description, parameters).
 - **Logic**: The actual code (e.g., Python script, API call) that executes when the tool is called.
 
-**Claude/MCP Integration**:
+### **Claude/MCP Integration**:
 - Define tools using the **Model Context Protocol (MCP)** or Claude's native tool format.
 - Agents can "call" these tools to fetch documentation, query databases, or run commands.
 - **Example**: A "Migrate to Helm" skill might be a composite of file operations and `helm lint` commands exposed as a comprehensive tool or workflow.
@@ -36,11 +36,11 @@ Skills extend the agent's capabilities by providing it with "tools" (functions) 
 
 Instead of maintaining a scratchpad, provide context through structured documentation.
 
-**Usage**:
+### **Usage**
 - **PRDs (Product Requirement Docs)**: Pass the full PRD to the agent at the start of a feature.
 - **RFCs (Request for Comments)**: Use technical design docs to align the agent on architectural decisions.
 
-**Workflow**:
+### **Workflow**
 1. **Prepare**: Ensure your PRD or RFC is comprehensive and up-to-date.
 2. **Inject**: `@mention` the relevant PRD/RFC file in the chat or include it in the context window.
 3. **Instruct**: Ask the agent to "Implement the feature described in @prd.md" or "Review this code against @rfc.md".

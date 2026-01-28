@@ -1,0 +1,15 @@
+site_name: DJ | ML Systems & GenAI
+site_description: Notes on ML systems, applied ML, and GenAI
+site_author: DJ
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+    - content.tabs.link
+
+nav:
+  - Home: index.md
+  - About: about.md

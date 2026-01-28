@@ -1,6 +1,7 @@
-# ONNX Conversion & Java Serving (CPU)
+# ONNX Conversion & Java Serving (CPU & GPU)
 
-High-performance inference on CPU using **ONNX Runtime (ORT)** in a **Java** environment.
+High-performance inference on CPU and GPU using **ONNX Runtime (ORT)** in a **Java** environment.
+
 
 ### Why ONNX + Java?
 - **JVM Ecosystem**: Integrate directly with existing Java/Scala backend services (Spring Boot, Flink, Spark).
@@ -103,7 +104,45 @@ public class ModelService {
 
 ---
 
-## 3. Performance Tuning (CPU)
+## 3. Java Inference (GPU / CUDA)
+
+To run on NVIDIA GPUs, switch dependencies and configure the session options.
+
+### Dependency (Maven)
+
+Replace `onnxruntime` with `onnxruntime_gpu`:
+
+```xml
+<dependency>
+    <groupId>com.microsoft.onnxruntime</groupId>
+    <artifactId>onnxruntime_gpu</artifactId>
+    <version>1.17.1</version>
+</dependency>
+```
+
+### CUDA Configuration Code
+
+```java
+import ai.onnxruntime.providers.OrtCUDAProviderOptions;
+
+// ... inside constructor ...
+
+OrtSession.SessionOptions opts = new OrtSession.SessionOptions();
+
+// 1. Configure CUDA Provider
+OrtCUDAProviderOptions cudaOpts = new OrtCUDAProviderOptions(0); // GPU Device ID 0
+opts.addCUDA(cudaOpts);
+
+// 2. Create Session (will load model onto GPU)
+this.session = env.createSession(modelPath, opts);
+```
+
+**Note**: Ensure the host machine has compatible NVIDIA Drivers and CUDA Toolkit installed (matching the ORT version).
+
+
+---
+
+## 4. Performance Tuning (CPU)
 
 | Setting | Recommendation |
 | :--- | :--- |
@@ -119,7 +158,7 @@ public class ModelService {
 
 ---
 
-## 4. Architecture Diagram
+## 5. Architecture Diagram
 
 ```mermaid
 graph TD

@@ -6,6 +6,20 @@ These notes describe a production-grade ML platform setup where **MLflow trackin
 are deployed as a **Cloud Run service**, and extended via **custom plugins** to support
 enterprise workflows.
 
+```mermaid
+graph LR
+    subgraph Container [Cloud Run Container]
+        MLflow[MLflow Core]
+        Plugin[Custom Plugins]
+        MLflow <-->|Extends| Plugin
+    end
+
+    User[User / Pipelines] --> Container
+    Container -->|Enables| Enterprise[Enterprise Workflows]
+    style Plugin fill:#f9f,stroke:#333,stroke-width:2px
+```
+
+
 The emphasis is on **system architecture, extensibility, and operational tradeoffs** rather than
 tutorial-style deployment.
 
@@ -153,17 +167,15 @@ MLflow plugins are used to **extend core behavior without forking MLflow**.
 
 Typical promotion flow:
 
-Training Job
-↓
-Log model to MLflow
-↓
-Register versioned model
-↓
-Plugin validation hooks
-↓
-Stage transition (staging / production)
-↓
-Downstream deployment automation
+```mermaid
+graph TD
+    Job[Training Job] --> Log[Log model to MLflow]
+    Log --> Reg[Register versioned model]
+    Reg --> Hook[Plugin validation hooks]
+    Hook --> Stage[Stage transition<br>staging / production]
+    Stage --> Deploy[Downstream deployment automation]
+```
+
 
 **Key principle:**  
 > The model registry is a **control surface**, not just a metadata store.

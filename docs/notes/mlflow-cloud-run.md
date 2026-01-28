@@ -30,16 +30,19 @@ This architecture addresses those gaps while keeping MLflow upgradeable.
 
 ## High-Level Architecture
 
-Clients (training jobs, notebooks, CI)
-|
-v
-Cloud Run (MLflow Tracking + Registry API)
-|
-+-- Plugin layer (auth, validation, metadata)
-|
-+-- Backend Store (Postgres / Cloud SQL)
-|
-+-- Artifact Store (GCS)
+```mermaid
+graph TD
+    Client[Clients<br>training jobs, notebooks, CI] --> CR[Cloud Run<br>MLflow Tracking + Registry API]
+    
+    subgraph Service[Cloud Run Service]
+        CR
+        Plugin[Plugin layer<br>auth, validation, metadata]
+        CR -.- Plugin
+    end
+    
+    CR --> DB[(Backend Store<br>Postgres / Cloud SQL)]
+    CR --> Storage[(Artifact Store<br>GCS)]
+```
 
 **Key idea:** MLflow operates as a **stateless control plane**, not a monolithic ML system.
 

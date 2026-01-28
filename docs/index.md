@@ -10,6 +10,7 @@ The goal is to move beyond surface-level tutorials and document production-grade
 Productionalizing ML models is harder than training them.
 - **[MLflow on Cloud Run](notes/mlflow-cloud-run.md)**: A serverless, scalable architecture for ML metadata and model registry.
 - **[ONNX Java Serving](notes/onnx-java-serving.md)**: High-performance CPU & GPU inference in Java using ONNX Runtime.
+- **[AI SDLC](notes/ai-sdlc.md)**: Context-as-Code framework for steering AI agents (`.cursorrules`, Skills, Notepads).
 
 ### [Cheatsheets]
 Quick references for frequent tasks.

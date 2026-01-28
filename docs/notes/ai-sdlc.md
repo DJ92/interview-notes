@@ -51,8 +51,21 @@ Instead of repeating instructions in every chat session, we commit **markdown co
 
 ---
 
+## 5. MCP Support
+
+**Model Context Protocol (MCP)** provides a standard interface for agents to connect with external data and tools.
+
+| Category | Supported Integrations |
+| :--- | :--- |
+| **Documentation** | **Google Docs**, **Google Drive** (Read specs, access loose notes). |
+| **Code & Deploy** | **GitHub** (PRs, Issues, Actions), **Docker** (Container management). |
+| **Project Management** | **JIRA**, **Linear** (Ticket tracking, sprint planning). |
+| **Communication** | **Slack** (Team updates, incident alerts). |
+
+---
+
 ## Workflow
 
 1. **Start**: Agent reads `.cursorrules` (Style) and `SCRATCHPAD.md` (Context).
-2. **Execute**: Agent uses **Skills** to perform tasks.
+2. **Execute**: Agent uses **Skills** and **MCP Tools** to perform tasks.
 3. **Commit**: Agent updates `SCRATCHPAD.md` with new state.

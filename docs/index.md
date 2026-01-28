@@ -1,28 +1,32 @@
 # Engineering Notes
 
-Welcome to my personal knowledge base. This site serves as a collection of notes, cheatsheets, and deep dives into **Machine Learning Systems**, **Applied GenAI**, and **Software Engineering** patterns.
+> "The best systems are boring."
 
-The goal is to move beyond surface-level tutorials and document production-grade patterns, trade-offs, and system designs.
+Welcome to my personal knowledge base. This site documents **production-grade patterns**, **trade-offs**, and **system designs** for building scalable software and AI systems.
 
-## 📚 Key Sections
+The goal is to move beyond surface-level tutorials and codify the "Context-as-Code" required to steer autonomous agents.
 
-### [Machine Learning Systems](notes/mlflow-cloud-run.md)
+## 🧠 Agentic AI & SDLC
+
+Standardizing how we build software with AI agents.
+
+- **[AI SDLC](notes/ai-sdlc.md)**: A framework for **Context-as-Code** (`.cursor/rules`, Skills, PRDs) and **MCP** integration to build consistent, high-quality software with agents.
+
+## ⚙️ Machine Learning Systems
+
 Productionalizing ML models is harder than training them.
-- **[MLflow on Cloud Run](notes/mlflow-cloud-run.md)**: A serverless, scalable architecture for ML metadata and model registry.
-- **[ONNX Java Serving](notes/onnx-java-serving.md)**: High-performance CPU & GPU inference in Java using ONNX Runtime.
-- **[AI SDLC](notes/ai-sdlc.md)**: Context-as-Code framework for steering AI agents (`.cursorrules`, Skills, Notepads).
 
-### [Cheatsheets]
-Quick references for frequent tasks.
-- **[Cloud Cheatsheet](notes/cloud-cheatsheet.md)**: Common CLI commands and patterns for major cloud providers.
-- **[Zsh Setup](notes/zsh-setup.md)**: Local dev environment (Powerlevel10k, Plugins, SDKMAN).
+- **[MLflow on Cloud Run](notes/mlflow-cloud-run.md)**: Serverless architecture for ML metadata and model registry.
+- **[ONNX Java Serving](notes/onnx-java-serving.md)**: High-performance CPU & GPU inference in Java environments.
 
-## 🚀 About
-Maintained by **Dheeraj Joshi**.
+## 🛠️ Developer Experience
 
-### Focus areas:
-- Large Scale ML Infrastructure
-- Generative AI Applications
-- Distributed Systems
+Tools and patterns for efficiency.
 
-*This site is built with MkDocs Material and deployed via GitHub Actions.*
+- **[Cloud Cheatsheet](notes/cloud-cheatsheet.md)**: CLI references for AWS/GCP/Azure.
+- **[Zsh Setup](notes/zsh-setup.md)**: A blazingly fast terminal environment (Powerlevel10k, SDKMAN).
+
+---
+
+### [About Me](about.md)
+Maintained by **Dheeraj Joshi**, a Staff Systems & Machine Learning Engineer focused on large-scale personalization and agentic AI systems.

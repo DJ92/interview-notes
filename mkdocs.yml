@@ -1,6 +1,7 @@
 site_name: DJ | ML Systems & GenAI
 site_description: Notes on ML systems, applied ML, and GenAI
 site_author: Dheeraj Joshi
+site_url: https://dj92.github.io/interview-notes/
 
 theme:
   name: material

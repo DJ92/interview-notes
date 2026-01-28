@@ -13,3 +13,5 @@ theme:
 nav:
   - Home: index.md
   - About: about.md
+  - Notes:
+    - Cloud Cheatsheet: notes/cloud-cheatsheet.md

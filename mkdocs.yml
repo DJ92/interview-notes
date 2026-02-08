@@ -27,3 +27,4 @@ nav:
     - ONNX Java Serving: notes/onnx-java-serving.md
     - Zsh Setup: notes/zsh-setup.md
     - AI SDLC: notes/ai-sdlc.md
+    - LLM Evaluation: notes/llm-evaluation.md

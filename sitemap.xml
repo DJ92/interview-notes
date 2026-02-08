@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://dj92.github.io/interview-notes/</loc>
+         <lastmod>2026-02-08</lastmod>
+    </url>
+    <url>
+         <loc>https://dj92.github.io/interview-notes/about/</loc>
+         <lastmod>2026-02-08</lastmod>
+    </url>
+    <url>
+         <loc>https://dj92.github.io/interview-notes/notes/ai-sdlc/</loc>
+         <lastmod>2026-02-08</lastmod>
+    </url>
+    <url>
+         <loc>https://dj92.github.io/interview-notes/notes/cloud-cheatsheet/</loc>
+         <lastmod>2026-02-08</lastmod>
+    </url>
+    <url>
+         <loc>https://dj92.github.io/interview-notes/notes/llm-evaluation/</loc>
+         <lastmod>2026-02-08</lastmod>
+    </url>
+    <url>
+         <loc>https://dj92.github.io/interview-notes/notes/mlflow-cloud-run/</loc>
+         <lastmod>2026-02-08</lastmod>
+    </url>
+    <url>
+         <loc>https://dj92.github.io/interview-notes/notes/onnx-java-serving/</loc>
+         <lastmod>2026-02-08</lastmod>
+    </url>
+    <url>
+         <loc>https://dj92.github.io/interview-notes/notes/zsh-setup/</loc>
+         <lastmod>2026-02-08</lastmod>
+    </url>
+</urlset>

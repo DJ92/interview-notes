@@ -1,0 +1,1336 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Notes on ML systems, applied ML, and GenAI">
+      
+      
+        <meta name="author" content="Dheeraj Joshi">
+      
+      
+        <link rel="canonical" href="https://dj92.github.io/interview-notes/notes/llm-pretraining/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>LLM Pre-training: CLM vs MLM - DJ | ML Systems & GenAI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#llm-pre-training-clm-vs-mlm" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="DJ | ML Systems &amp; GenAI" class="md-header__button md-logo" aria-label="DJ | ML Systems & GenAI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DJ | ML Systems & GenAI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              LLM Pre-training: CLM vs MLM
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../about/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  About
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../cloud-cheatsheet/" class="md-tabs__link">
+          
+  
+  
+  Notes
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="DJ | ML Systems &amp; GenAI" class="md-nav__button md-logo" aria-label="DJ | ML Systems & GenAI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DJ | ML Systems & GenAI
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Notes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud-cheatsheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Cheatsheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mlflow-cloud-run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../onnx-java-serving/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ONNX Java Serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../zsh-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zsh Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ai-sdlc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI SDLC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-pre-training-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Pre-training Problem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#causal-language-modeling-clm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Causal Language Modeling (CLM)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Causal Language Modeling (CLM)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-clm-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How CLM Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causal-masking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Causal Masking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages-of-clm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advantages of CLM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disadvantages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disadvantages
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#masked-language-modeling-mlm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Masked Language Modeling (MLM)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Masked Language Modeling (MLM)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-mlm-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How MLM Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#801010-masking-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        80/10/10 Masking Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages-of-mlm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advantages of MLM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disadvantages_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disadvantages
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clm-vs-mlm-head-to-head" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLM vs MLM: Head-to-Head
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#training-dynamics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Training Dynamics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Training Dynamics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#learning-rate-scheduling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learning Rate Scheduling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#perplexity-the-key-metric" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Perplexity: The Key Metric
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modern-hybrid-approaches" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modern Hybrid Approaches
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modern Hybrid Approaches">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefix-lm-t5-ul2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefix LM (T5, UL2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#span-corruption-t5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Span Corruption (T5)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Tips
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#memory-efficient-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Memory-Efficient Training
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mixed-precision-fp16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mixed Precision (FP16)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scaling-laws" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaling Laws
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#which-objective-to-choose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which Objective to Choose?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#production-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Production Considerations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="llm-pre-training-clm-vs-mlm">LLM Pre-training: CLM vs MLM</h1>
+<blockquote>
+<p>Understanding the objectives that teach language models to understand language.</p>
+</blockquote>
+<p>Pre-training is where LLMs learn the statistical structure of language from massive text corpora. This post explores the two dominant approaches and their trade-offs.</p>
+<h2 id="the-pre-training-problem">The Pre-training Problem</h2>
+<p><strong>Goal</strong>: Learn general language representations from unlabeled text.</p>
+<p><strong>Challenge</strong>: How do you create a learning signal without labels?</p>
+<p><strong>Solution</strong>: Self-supervised learning - create labels from the data itself.</p>
+<h2 id="causal-language-modeling-clm">Causal Language Modeling (CLM)</h2>
+<p><strong>Used by</strong>: GPT, LLaMA, Claude, GPT-4</p>
+<p><strong>Objective</strong>: Predict the next token given all previous tokens.</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">CausalLanguageModeling</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">input_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        CLM: Predict next token for each position</span>
+
+<span class="sd">        Input:  &quot;The cat sat on&quot;</span>
+<span class="sd">        Labels: &quot;cat sat on the&quot; (shifted by 1)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Forward pass</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">)</span>
+
+        <span class="c1"># Shift logits and labels for next-token prediction</span>
+        <span class="n">shift_logits</span> <span class="o">=</span> <span class="n">logits</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>  <span class="c1"># Remove last token</span>
+        <span class="n">shift_labels</span> <span class="o">=</span> <span class="n">input_ids</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>   <span class="c1"># Remove first token</span>
+
+        <span class="c1"># Cross-entropy loss</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span>
+            <span class="n">shift_logits</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shift_logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="n">shift_labels</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">ignore_index</span><span class="o">=</span><span class="n">pad_token_id</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">loss</span>
+</code></pre></div>
+<h3 id="how-clm-works">How CLM Works</h3>
+<p>Given text: <code>"The quick brown fox jumps"</code></p>
+<table>
+<thead>
+<tr>
+<th>Position</th>
+<th>Input Context</th>
+<th>Predict</th>
+<th>Label</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>[BOS]</td>
+<td>→</td>
+<td>The</td>
+</tr>
+<tr>
+<td>1</td>
+<td>[BOS] The</td>
+<td>→</td>
+<td>quick</td>
+</tr>
+<tr>
+<td>2</td>
+<td>[BOS] The quick</td>
+<td>→</td>
+<td>brown</td>
+</tr>
+<tr>
+<td>3</td>
+<td>[BOS] The quick brown</td>
+<td>→</td>
+<td>fox</td>
+</tr>
+<tr>
+<td>4</td>
+<td>[BOS] The quick brown fox</td>
+<td>→</td>
+<td>jumps</td>
+</tr>
+</tbody>
+</table>
+<p>Each position predicts the <strong>next token</strong> using all <strong>previous tokens</strong>.</p>
+<h3 id="causal-masking">Causal Masking</h3>
+<p>The key trick: prevent the model from "cheating" by looking ahead:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_causal_mask</span><span class="p">(</span><span class="n">seq_len</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Lower triangular matrix:</span>
+<span class="sd">    [[1, 0, 0, 0],</span>
+<span class="sd">     [1, 1, 0, 0],</span>
+<span class="sd">     [1, 1, 1, 0],</span>
+<span class="sd">     [1, 1, 1, 1]]</span>
+
+<span class="sd">    Position i can only attend to positions &lt;= i</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">))</span>
+</code></pre></div>
+<p><strong>Why causal?</strong> Because we only have access to past tokens during generation!</p>
+<h3 id="advantages-of-clm">Advantages of CLM</h3>
+<p>✅ <strong>Natural generation</strong>: Training objective matches inference (autoregressive)
+✅ <strong>Simple</strong>: No masking strategy needed
+✅ <strong>Scalable</strong>: Works well with billions of parameters
+✅ <strong>Long-form generation</strong>: Learns to generate coherent long text</p>
+<h3 id="disadvantages">Disadvantages</h3>
+<p>❌ <strong>Unidirectional</strong>: Can only look at left context, not right
+❌ <strong>Less efficient</strong>: Only one prediction per token
+❌ <strong>Task mismatch</strong>: Not ideal for classification (no bidirectional context)</p>
+<h2 id="masked-language-modeling-mlm">Masked Language Modeling (MLM)</h2>
+<p><strong>Used by</strong>: BERT, RoBERTa, ALBERT</p>
+<p><strong>Objective</strong>: Predict masked tokens using bidirectional context.</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MaskedLanguageModeling</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_token_id</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">mask_prob</span><span class="o">=</span><span class="mf">0.15</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask_token_id</span> <span class="o">=</span> <span class="n">mask_token_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask_prob</span> <span class="o">=</span> <span class="n">mask_prob</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_masked_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_ids</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        MLM Masking Strategy (80/10/10):</span>
+<span class="sd">        - 80% of time: Replace with [MASK]</span>
+<span class="sd">        - 10% of time: Replace with random token</span>
+<span class="sd">        - 10% of time: Keep unchanged</span>
+
+<span class="sd">        Why? Prevents model from learning &quot;only predict [MASK] tokens&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">input_ids</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+        <span class="n">probability_matrix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_prob</span><span class="p">)</span>
+
+        <span class="c1"># Select 15% of tokens to mask</span>
+        <span class="n">masked_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bernoulli</span><span class="p">(</span><span class="n">probability_matrix</span><span class="p">)</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
+
+        <span class="c1"># 80% → [MASK]</span>
+        <span class="n">indices_replaced</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bernoulli</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">))</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">masked_indices</span>
+        <span class="n">input_ids</span><span class="p">[</span><span class="n">indices_replaced</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_token_id</span>
+
+        <span class="c1"># 10% → random token</span>
+        <span class="n">indices_random</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bernoulli</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
+        <span class="n">indices_random</span> <span class="o">&amp;=</span> <span class="n">masked_indices</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">indices_replaced</span>
+        <span class="n">random_tokens</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vocab</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+        <span class="n">input_ids</span><span class="p">[</span><span class="n">indices_random</span><span class="p">]</span> <span class="o">=</span> <span class="n">random_tokens</span><span class="p">[</span><span class="n">indices_random</span><span class="p">]</span>
+
+        <span class="c1"># 10% → unchanged (already original)</span>
+
+        <span class="c1"># Only compute loss on masked tokens</span>
+        <span class="n">labels</span><span class="p">[</span><span class="o">~</span><span class="n">masked_indices</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>  <span class="c1"># ignore_index</span>
+
+        <span class="k">return</span> <span class="n">input_ids</span><span class="p">,</span> <span class="n">labels</span>
+</code></pre></div>
+<h3 id="how-mlm-works">How MLM Works</h3>
+<p>Original: <code>"The quick brown fox jumps"</code></p>
+<p>Masked:  <code>"The [MASK] brown [MASK] jumps"</code> (15% masked)</p>
+<p>Predict: <code>quick</code> and <code>fox</code> using bidirectional context</p>
+<h3 id="801010-masking-strategy">80/10/10 Masking Strategy</h3>
+<p><strong>Why not always use [MASK]?</strong>
+- At fine-tuning/inference, there's no [MASK] token!
+- Model would overfit to predicting when it sees [MASK]</p>
+<p><strong>Solution</strong>: Mix it up!
+- 80%: Use [MASK] (main training signal)
+- 10%: Use random token (robustness to noise)
+- 10%: Keep original (distribute across all tokens)</p>
+<h3 id="example-implementation">Example Implementation</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">input_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    MLM: Predict only masked tokens with bidirectional context</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create masked input and labels</span>
+    <span class="n">masked_input_ids</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_masked_input</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
+
+    <span class="c1"># Forward pass with bidirectional attention</span>
+    <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">masked_input_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">)</span>
+
+    <span class="c1"># Loss only on masked positions</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span>
+        <span class="n">logits</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+        <span class="n">labels</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">ignore_index</span><span class="o">=-</span><span class="mi">100</span>  <span class="c1"># Don&#39;t compute loss on non-masked tokens</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">loss</span>
+</code></pre></div>
+<h3 id="advantages-of-mlm">Advantages of MLM</h3>
+<p>✅ <strong>Bidirectional context</strong>: See both left and right context
+✅ <strong>Better representations</strong>: Learns richer embeddings
+✅ <strong>Efficient training</strong>: Predict multiple tokens per sample
+✅ <strong>Great for classification</strong>: Ideal for tasks needing bidirectional understanding</p>
+<h3 id="disadvantages_1">Disadvantages</h3>
+<p>❌ <strong>Train-test mismatch</strong>: [MASK] token doesn't appear during fine-tuning
+❌ <strong>Not generative</strong>: Can't naturally do autoregressive generation
+❌ <strong>Complex masking</strong>: 80/10/10 strategy adds complexity
+❌ <strong>Pretrain-finetune gap</strong>: Two-stage training can be suboptimal</p>
+<h2 id="clm-vs-mlm-head-to-head">CLM vs MLM: Head-to-Head</h2>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>CLM (GPT)</th>
+<th>MLM (BERT)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Context</strong></td>
+<td>Unidirectional (left only)</td>
+<td>Bidirectional (left + right)</td>
+</tr>
+<tr>
+<td><strong>Training</strong></td>
+<td>Next-token prediction</td>
+<td>Masked token prediction</td>
+</tr>
+<tr>
+<td><strong>Generation</strong></td>
+<td>Natural (autoregressive)</td>
+<td>Not designed for it</td>
+</tr>
+<tr>
+<td><strong>Classification</strong></td>
+<td>Requires prompting</td>
+<td>Direct fine-tuning</td>
+</tr>
+<tr>
+<td><strong>Embeddings</strong></td>
+<td>Contextualized (left)</td>
+<td>Contextualized (bidirectional)</td>
+</tr>
+<tr>
+<td><strong>Use Cases</strong></td>
+<td>Chat, completion, writing</td>
+<td>Classification, QA, NER</td>
+</tr>
+<tr>
+<td><strong>Modern Usage</strong></td>
+<td>GPT-4, Claude, LLaMA</td>
+<td>BERT variants declining</td>
+</tr>
+</tbody>
+</table>
+<h2 id="training-dynamics">Training Dynamics</h2>
+<h3 id="learning-rate-scheduling">Learning Rate Scheduling</h3>
+<p>Both CLM and MLM use <strong>warmup + cosine decay</strong>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">WarmupCosineSchedule</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">warmup_steps</span><span class="p">,</span> <span class="n">total_steps</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warmup_steps</span> <span class="o">=</span> <span class="n">warmup_steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_steps</span> <span class="o">=</span> <span class="n">total_steps</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_step</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">current_step</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">warmup_steps</span><span class="p">:</span>
+            <span class="c1"># Linear warmup</span>
+            <span class="n">lr_scale</span> <span class="o">=</span> <span class="n">current_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">warmup_steps</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Cosine decay</span>
+            <span class="n">progress</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_step</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">warmup_steps</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_steps</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">warmup_steps</span><span class="p">)</span>
+            <span class="n">lr_scale</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">progress</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">param_group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">:</span>
+            <span class="n">param_group</span><span class="p">[</span><span class="s1">&#39;lr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_group</span><span class="p">[</span><span class="s1">&#39;initial_lr&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lr_scale</span>
+</code></pre></div>
+<p><strong>Why warmup?</strong>
+- Large learning rates at initialization → exploding gradients
+- Warmup allows model to stabilize before aggressive updates</p>
+<p><strong>Why cosine decay?</strong>
+- Smooth annealing to zero
+- Better final performance than step decay</p>
+<h3 id="perplexity-the-key-metric">Perplexity: The Key Metric</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_perplexity</span><span class="p">(</span><span class="n">loss</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perplexity = exp(cross-entropy loss)</span>
+
+<span class="sd">    Interpretation: &quot;How many choices on average?&quot;</span>
+<span class="sd">    - PPL of 10: Model is confused between ~10 tokens</span>
+<span class="sd">    - PPL of 2: Model is highly confident</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Good Perplexity Values</strong>:
+- Raw text (no training): ~10,000+ (totally random)
+- Well-trained LLM: 10-30 (depends on domain)
+- Overfitting: &lt;5 (too confident, memorizing)</p>
+<h2 id="modern-hybrid-approaches">Modern Hybrid Approaches</h2>
+<h3 id="prefix-lm-t5-ul2">Prefix LM (T5, UL2)</h3>
+<p>Combine CLM + MLM benefits:
+<div class="highlight"><pre><span></span><code>Prefix:   [BOS] The quick brown  (bidirectional)
+Targets:  fox jumps over         (causal)
+</code></pre></div></p>
+<h3 id="span-corruption-t5">Span Corruption (T5)</h3>
+<p>Mask spans of tokens instead of individual tokens:
+<div class="highlight"><pre><span></span><code>Original: The quick brown fox jumps
+Masked:   The [X] fox [Y]
+Targets:  [X] quick brown [Y] jumps
+</code></pre></div></p>
+<h2 id="implementation-tips">Implementation Tips</h2>
+<h3 id="memory-efficient-training">Memory-Efficient Training</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Gradient accumulation for large batch sizes</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">batch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataloader</span><span class="p">):</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span> <span class="o">/</span> <span class="n">accumulation_steps</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">accumulation_steps</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="mixed-precision-fp16">Mixed Precision (FP16)</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">torch.cuda.amp</span><span class="w"> </span><span class="kn">import</span> <span class="n">autocast</span><span class="p">,</span> <span class="n">GradScaler</span>
+
+<span class="n">scaler</span> <span class="o">=</span> <span class="n">GradScaler</span><span class="p">()</span>
+
+<span class="k">with</span> <span class="n">autocast</span><span class="p">():</span>  <span class="c1"># Compute in FP16</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
+
+<span class="n">scaler</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="n">scaler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">optimizer</span><span class="p">)</span>
+<span class="n">scaler</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+</code></pre></div>
+<p><strong>Benefits</strong>: 2× faster, 2× less memory</p>
+<h2 id="scaling-laws">Scaling Laws</h2>
+<p><strong>Chinchilla Scaling Laws</strong> (2022):
+- Optimal model size : training tokens ≈ 1:20
+- GPT-3 (175B params): Should train on 3.5T tokens
+- Most models are undertrained!</p>
+<p><strong>Implications</strong>:
+- Smaller models trained longer &gt; larger models trained less
+- Data quality &gt; data quantity (garbage in = garbage out)</p>
+<h2 id="which-objective-to-choose">Which Objective to Choose?</h2>
+<p><strong>Use CLM if</strong>:
+- Building a chatbot or writing assistant
+- Need text generation capabilities
+- Want simple, unified training</p>
+<p><strong>Use MLM if</strong>:
+- Building a classifier or encoder
+- Need strong embeddings
+- Don't need generation</p>
+<p><strong>Modern trend</strong>: CLM dominates (GPT-4, Claude, LLaMA)
+- Unified architecture (no separate encoder/decoder)
+- Scales better to large models
+- Can do both generation AND classification (with prompting)</p>
+<h2 id="key-takeaways">Key Takeaways</h2>
+<ol>
+<li><strong>CLM (GPT-style)</strong>: Predict next token, unidirectional, great for generation</li>
+<li><strong>MLM (BERT-style)</strong>: Predict masked tokens, bidirectional, great for understanding</li>
+<li><strong>80/10/10 masking</strong>: Prevents overfitting to [MASK] token</li>
+<li><strong>Warmup + cosine decay</strong>: Standard LR schedule for stable training</li>
+<li><strong>Perplexity</strong>: exp(loss), measures model uncertainty</li>
+<li><strong>Modern trend</strong>: CLM winning for general-purpose LLMs</li>
+<li><strong>Scale matters</strong>: More data + compute = better models</li>
+</ol>
+<h2 id="production-considerations">Production Considerations</h2>
+<p><strong>Training Costs</strong>:
+- GPT-3: ~$5M to train (estimated)
+- LLaMA 65B: ~$3M on 1.4T tokens
+- Use smaller models + longer training (Chinchilla optimal)</p>
+<p><strong>Data Quality</strong>:
+- Deduplication: Remove duplicates (improves quality)
+- Filtering: Remove toxic/low-quality content
+- Mixing: Balance domains (code, web, books)</p>
+<p><strong>Checkpointing</strong>:
+- Save checkpoints every N steps
+- Resume from failures (cloud preemption)
+- Evaluate intermediate checkpoints</p>
+<h2 id="further-reading">Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1810.04805">BERT: Pre-training of Deep Bidirectional Transformers</a></li>
+<li><a href="https://d4mucfpksywv.cloudfront.net/better-language-models/language_models_are_unsupervised_multitask_learners.pdf">Language Models are Unsupervised Multitask Learners (GPT-2)</a></li>
+<li><a href="https://arxiv.org/abs/2203.15556">Training Compute-Optimal Large Language Models (Chinchilla)</a></li>
+<li><a href="https://github.com/DJ92/ai-research-portfolio/tree/main/10-llm-pre-training">GitHub: Pre-training Implementation</a></li>
+</ul>
+<hr />
+<p><em>Part of my <a href="https://github.com/DJ92/ai-research-portfolio">AI Research Portfolio</a> - implementing pre-training from scratch to understand LLM foundations.</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

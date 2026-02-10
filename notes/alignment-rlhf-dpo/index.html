@@ -1,0 +1,1351 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Notes on ML systems, applied ML, and GenAI">
+      
+      
+        <meta name="author" content="Dheeraj Joshi">
+      
+      
+        <link rel="canonical" href="https://dj92.github.io/interview-notes/notes/alignment-rlhf-dpo/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Alignment Methods: RLHF vs DPO - DJ | ML Systems & GenAI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#alignment-methods-rlhf-vs-dpo" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="DJ | ML Systems &amp; GenAI" class="md-header__button md-logo" aria-label="DJ | ML Systems & GenAI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DJ | ML Systems & GenAI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Alignment Methods: RLHF vs DPO
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../about/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  About
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../cloud-cheatsheet/" class="md-tabs__link">
+          
+  
+  
+  Notes
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="DJ | ML Systems &amp; GenAI" class="md-nav__button md-logo" aria-label="DJ | ML Systems & GenAI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DJ | ML Systems & GenAI
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Notes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud-cheatsheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Cheatsheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mlflow-cloud-run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../onnx-java-serving/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ONNX Java Serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../zsh-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zsh Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ai-sdlc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI SDLC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-alignment-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Alignment Problem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#three-stage-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Three-Stage Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stage-1-supervised-fine-tuning-sft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stage 1: Supervised Fine-Tuning (SFT)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stage-2-preference-alignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stage 2: Preference Alignment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rlhf-reinforcement-learning-from-human-feedback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RLHF: Reinforcement Learning from Human Feedback
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RLHF: Reinforcement Learning from Human Feedback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-train-a-reward-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Train a Reward Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-optimize-policy-with-ppo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Optimize Policy with PPO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-iterate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Iterate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rlhf-challenges" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RLHF Challenges
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dpo-direct-preference-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DPO: Direct Preference Optimization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DPO: Direct Preference Optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-dpo-trick" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The DPO Trick
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dpo-loss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DPO Loss
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dpo-intuition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DPO Intuition
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rlhf-vs-dpo-head-to-head" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RLHF vs DPO: Head-to-Head
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#which-method-to-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which Method to Use?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Which Method to Use?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#use-rlhf-if" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use RLHF if:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-dpo-if" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use DPO if:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Tips
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-quality-matters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Quality Matters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hyperparameter-tuning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hyperparameter Tuning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-constitutional-ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced: Constitutional AI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#production-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Production Considerations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="alignment-methods-rlhf-vs-dpo">Alignment Methods: RLHF vs DPO</h1>
+<blockquote>
+<p>How do we teach LLMs to be helpful, harmless, and honest? Two approaches dominate: RLHF and DPO.</p>
+</blockquote>
+<p>Post-training alignment is what transforms a base LLM into a useful assistant. This post explores the two main techniques and their trade-offs.</p>
+<h2 id="the-alignment-problem">The Alignment Problem</h2>
+<p><strong>Base LLM</strong> (after pre-training):
+- Completes text based on internet training data
+- No notion of "helpful" vs "harmful"
+- Might continue toxic prompts, refuse reasonable requests</p>
+<p><strong>Aligned LLM</strong> (after post-training):
+- Follows instructions reliably
+- Refuses harmful requests
+- Provides helpful, safe responses</p>
+<p><strong>How do we get there?</strong> Enter post-training alignment.</p>
+<h2 id="three-stage-pipeline">Three-Stage Pipeline</h2>
+<p>Modern LLMs follow a three-stage process:</p>
+<div class="highlight"><pre><span></span><code>1. Pre-training (CLM/MLM)
+   ↓
+2. Supervised Fine-Tuning (SFT)
+   ↓
+3. Preference Alignment (RLHF or DPO)
+</code></pre></div>
+<p>Let's explore each stage.</p>
+<h2 id="stage-1-supervised-fine-tuning-sft">Stage 1: Supervised Fine-Tuning (SFT)</h2>
+<p><strong>Goal</strong>: Teach the model to follow instructions.</p>
+<p><strong>Data</strong>: Human-written (prompt, response) pairs:
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;prompt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;What is the capital of France?&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;response&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;The capital of France is Paris.&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Training</strong>: Standard next-token prediction, but only on the response:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">SupervisedFineTuner</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">input_ids</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Only compute loss on response tokens (ignore prompt)</span>
+
+<span class="sd">        Input:  [PROMPT] What is the capital of France? [RESPONSE] Paris.</span>
+<span class="sd">        Labels: [-100, -100, -100, -100, -100, -100, -100, Paris, .]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
+
+        <span class="c1"># Mask prompt tokens with -100 (ignore_index)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span>
+            <span class="n">logits</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="n">labels</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">ignore_index</span><span class="o">=-</span><span class="mi">100</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">loss</span>
+</code></pre></div>
+<p><strong>Why mask the prompt?</strong>
+- We already know the prompt (given by user)
+- We want to learn <strong>responses</strong>, not repeat prompts</p>
+<p><strong>Limitation</strong>: SFT teaches <em>what</em> to say, but not how to rank responses by quality.</p>
+<h2 id="stage-2-preference-alignment">Stage 2: Preference Alignment</h2>
+<p>After SFT, we have a model that can follow instructions. But how do we make it <strong>better</strong>?</p>
+<p><strong>Key Insight</strong>: It's easier to compare two responses than write a perfect one.</p>
+<p><strong>Human Preference Data</strong>:
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;prompt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Explain photosynthesis&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;chosen&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Photosynthesis is the process where plants convert light...&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;rejected&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;idk google it&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>Two approaches dominate: <strong>RLHF</strong> and <strong>DPO</strong>.</p>
+<hr />
+<h2 id="rlhf-reinforcement-learning-from-human-feedback">RLHF: Reinforcement Learning from Human Feedback</h2>
+<p><strong>Used by</strong>: GPT-4, Claude, early ChatGPT</p>
+<p>RLHF has three steps:</p>
+<h3 id="step-1-train-a-reward-model">Step 1: Train a Reward Model</h3>
+<p>Build a model that predicts human preferences:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">RewardModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_model</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_model</span> <span class="o">=</span> <span class="n">base_model</span>  <span class="c1"># Frozen SFT model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reward_head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns: scalar reward for the entire sequence</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get hidden states from base model</span>
+        <span class="n">hidden_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">)</span>
+
+        <span class="c1"># Get last token&#39;s hidden state</span>
+        <span class="n">last_token_idx</span> <span class="o">=</span> <span class="n">attention_mask</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">last_hidden</span> <span class="o">=</span> <span class="n">hidden_states</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)),</span> <span class="n">last_token_idx</span><span class="p">]</span>
+
+        <span class="c1"># Project to scalar reward</span>
+        <span class="n">reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_head</span><span class="p">(</span><span class="n">last_hidden</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">reward</span>
+</code></pre></div>
+<p><strong>Training Objective</strong> (Bradley-Terry Model):
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_reward_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chosen_ids</span><span class="p">,</span> <span class="n">rejected_ids</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Train reward model to prefer chosen over rejected</span>
+
+<span class="sd">    Loss = -log σ(r_chosen - r_rejected)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">r_chosen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_model</span><span class="p">(</span><span class="n">chosen_ids</span><span class="p">)</span>
+    <span class="n">r_rejected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_model</span><span class="p">(</span><span class="n">rejected_ids</span><span class="p">)</span>
+
+    <span class="c1"># Reward model should predict: r_chosen &gt; r_rejected</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">F</span><span class="o">.</span><span class="n">logsigmoid</span><span class="p">(</span><span class="n">r_chosen</span> <span class="o">-</span> <span class="n">r_rejected</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">loss</span>
+</code></pre></div></p>
+<p><strong>Bradley-Terry Model</strong>: <code>P(chosen &gt; rejected) = σ(r_chosen - r_rejected)</code></p>
+<h3 id="step-2-optimize-policy-with-ppo">Step 2: Optimize Policy with PPO</h3>
+<p>Use the reward model to fine-tune the SFT model:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">RLHFTrainer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy_model</span><span class="p">,</span> <span class="n">reward_model</span><span class="p">,</span> <span class="n">ref_model</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="o">=</span> <span class="n">policy_model</span>      <span class="c1"># Model being trained</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reward_model</span> <span class="o">=</span> <span class="n">reward_model</span>  <span class="c1"># Frozen reward predictor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_model</span> <span class="o">=</span> <span class="n">ref_model</span>      <span class="c1"># Frozen SFT model (reference)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span>                <span class="c1"># KL penalty coefficient</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_rl_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompts</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        PPO objective with KL penalty</span>
+
+<span class="sd">        reward = r(x, y) - β * KL(π_θ || π_ref)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Generate responses from current policy</span>
+        <span class="n">responses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">prompts</span><span class="p">)</span>
+
+        <span class="c1"># Get reward from reward model</span>
+        <span class="n">rewards</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_model</span><span class="p">(</span><span class="n">prompts</span> <span class="o">+</span> <span class="n">responses</span><span class="p">)</span>
+
+        <span class="c1"># Compute KL divergence from reference model</span>
+        <span class="n">policy_logprobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">prompts</span><span class="p">,</span> <span class="n">responses</span><span class="p">)</span>
+        <span class="n">ref_logprobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_model</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">prompts</span><span class="p">,</span> <span class="n">responses</span><span class="p">)</span>
+        <span class="n">kl_penalty</span> <span class="o">=</span> <span class="p">(</span><span class="n">policy_logprobs</span> <span class="o">-</span> <span class="n">ref_logprobs</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+        <span class="c1"># Combined objective</span>
+        <span class="n">rl_loss</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">rewards</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">*</span> <span class="n">kl_penalty</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">rl_loss</span>
+</code></pre></div>
+<p><strong>Why KL penalty?</strong>
+- Prevents policy from drifting too far from SFT model
+- Without it: model might exploit reward model bugs, generate nonsense
+- β controls exploration vs exploitation</p>
+<h3 id="step-3-iterate">Step 3: Iterate</h3>
+<p>Collect more preference data from the updated policy, retrain reward model, repeat.</p>
+<hr />
+<h3 id="rlhf-challenges">RLHF Challenges</h3>
+<p>❌ <strong>Complexity</strong>: Three models (policy, reward, reference), RL training is tricky
+❌ <strong>Instability</strong>: PPO is sensitive to hyperparameters
+❌ <strong>Reward Hacking</strong>: Policy might exploit reward model weaknesses
+❌ <strong>Slow</strong>: Requires sampling from policy during training
+❌ <strong>Memory</strong>: Need to keep 3 models in memory</p>
+<hr />
+<h2 id="dpo-direct-preference-optimization">DPO: Direct Preference Optimization</h2>
+<p><strong>Used by</strong>: LLaMA 2, Mistral 7B, modern open-source models</p>
+<p><strong>Key Insight</strong>: We can skip the reward model and optimize preferences directly!</p>
+<h3 id="the-dpo-trick">The DPO Trick</h3>
+<p>RLHF objective:
+<div class="highlight"><pre><span></span><code>max E[r(x,y)] - β * KL(π_θ || π_ref)
+</code></pre></div></p>
+<p>DPO insight: This has a <strong>closed-form optimal solution</strong>:
+<div class="highlight"><pre><span></span><code>π*(y|x) ∝ π_ref(y|x) * exp(r(x,y) / β)
+
+Rearranging:
+r(x,y) = β * log(π*(y|x) / π_ref(y|x))
+</code></pre></div></p>
+<p><strong>Implication</strong>: Reward is implicitly defined by the policy ratio!</p>
+<h3 id="dpo-loss">DPO Loss</h3>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">DirectPreferenceOptimization</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy_model</span><span class="p">,</span> <span class="n">ref_model</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="o">=</span> <span class="n">policy_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_model</span> <span class="o">=</span> <span class="n">ref_model</span>  <span class="c1"># Frozen SFT model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompts</span><span class="p">,</span> <span class="n">chosen</span><span class="p">,</span> <span class="n">rejected</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        DPO Loss: Maximize likelihood ratio for chosen &gt; rejected</span>
+
+<span class="sd">        loss = -E[log σ(β * (log π_θ(chosen) / π_ref(chosen)</span>
+<span class="sd">                           - log π_θ(rejected) / π_ref(rejected)))]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Compute log probs for policy</span>
+        <span class="n">policy_chosen_logps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">prompts</span><span class="p">,</span> <span class="n">chosen</span><span class="p">)</span>
+        <span class="n">policy_rejected_logps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">prompts</span><span class="p">,</span> <span class="n">rejected</span><span class="p">)</span>
+
+        <span class="c1"># Compute log probs for reference</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">ref_chosen_logps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_model</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">prompts</span><span class="p">,</span> <span class="n">chosen</span><span class="p">)</span>
+            <span class="n">ref_rejected_logps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_model</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">prompts</span><span class="p">,</span> <span class="n">rejected</span><span class="p">)</span>
+
+        <span class="c1"># Compute log ratios (implicit rewards)</span>
+        <span class="n">chosen_log_ratio</span> <span class="o">=</span> <span class="n">policy_chosen_logps</span> <span class="o">-</span> <span class="n">ref_chosen_logps</span>
+        <span class="n">rejected_log_ratio</span> <span class="o">=</span> <span class="n">policy_rejected_logps</span> <span class="o">-</span> <span class="n">ref_rejected_logps</span>
+
+        <span class="c1"># DPO loss</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">*</span> <span class="p">(</span><span class="n">chosen_log_ratio</span> <span class="o">-</span> <span class="n">rejected_log_ratio</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">F</span><span class="o">.</span><span class="n">logsigmoid</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">loss</span>
+</code></pre></div>
+<h3 id="dpo-intuition">DPO Intuition</h3>
+<p><strong>What's happening?</strong>
+1. Increase probability of chosen responses
+2. Decrease probability of rejected responses
+3. Stay close to reference model (implicit KL penalty via log ratio)</p>
+<p><strong>No reward model needed!</strong> The preference signal is baked directly into the loss.</p>
+<hr />
+<h2 id="rlhf-vs-dpo-head-to-head">RLHF vs DPO: Head-to-Head</h2>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>RLHF</th>
+<th>DPO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Models Needed</strong></td>
+<td>3 (policy, reward, ref)</td>
+<td>2 (policy, ref)</td>
+</tr>
+<tr>
+<td><strong>Training</strong></td>
+<td>RL (PPO)</td>
+<td>Supervised (standard backprop)</td>
+</tr>
+<tr>
+<td><strong>Stability</strong></td>
+<td>Tricky (RL instability)</td>
+<td>Stable (classification-like)</td>
+</tr>
+<tr>
+<td><strong>Memory</strong></td>
+<td>High (3 models)</td>
+<td>Medium (2 models)</td>
+</tr>
+<tr>
+<td><strong>Speed</strong></td>
+<td>Slow (sampling required)</td>
+<td>Fast (offline data)</td>
+</tr>
+<tr>
+<td><strong>Reward Hacking</strong></td>
+<td>Possible</td>
+<td>Less likely</td>
+</tr>
+<tr>
+<td><strong>Hyperparameters</strong></td>
+<td>Many (PPO params)</td>
+<td>Few (β only)</td>
+</tr>
+<tr>
+<td><strong>Implementation</strong></td>
+<td>Complex</td>
+<td>Simple</td>
+</tr>
+<tr>
+<td><strong>Performance</strong></td>
+<td>Slightly better (when tuned)</td>
+<td>Competitive</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="which-method-to-use">Which Method to Use?</h2>
+<h3 id="use-rlhf-if">Use RLHF if:</h3>
+<ul>
+<li>You have extensive RL expertise</li>
+<li>You can afford the compute (3 models)</li>
+<li>You need iterative improvement (online learning)</li>
+<li>You're OpenAI/Anthropic with massive resources</li>
+</ul>
+<h3 id="use-dpo-if">Use DPO if:</h3>
+<ul>
+<li>You want simplicity and stability</li>
+<li>You have limited compute</li>
+<li>You're training open-source models</li>
+<li>You prefer standard supervised learning</li>
+</ul>
+<p><strong>Modern trend</strong>: DPO is winning for open-source models due to simplicity.</p>
+<hr />
+<h2 id="implementation-tips">Implementation Tips</h2>
+<h3 id="data-quality-matters">Data Quality Matters</h3>
+<p><strong>Good preference data</strong>:
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;prompt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Write a poem about summer&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;chosen&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Golden rays dance on waves so bright...&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;rejected&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;summer is hot lol&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Bad preference data</strong> (too similar):
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;prompt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;What is 2+2?&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;chosen&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2+2 equals 4.&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;rejected&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2+2 is 4.&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Rule</strong>: Chosen and rejected should be clearly different in quality.</p>
+<h3 id="hyperparameter-tuning">Hyperparameter Tuning</h3>
+<p><strong>β (KL penalty coefficient)</strong>:
+- <strong>Too small</strong> (β=0.001): Model drifts too far, generates nonsense
+- <strong>Too large</strong> (β=1.0): Model barely changes, stays close to SFT
+- <strong>Sweet spot</strong>: 0.01-0.1 for most tasks</p>
+<p><strong>Learning rate</strong>:
+- <strong>RLHF</strong>: 1e-6 to 1e-5 (RL is sensitive)
+- <strong>DPO</strong>: 1e-6 to 5e-6 (stable)</p>
+<h3 id="evaluation">Evaluation</h3>
+<p>Don't just trust loss! Evaluate with:</p>
+<p><strong>1. Win Rate</strong>:
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_win_rate</span><span class="p">(</span><span class="n">model_a</span><span class="p">,</span> <span class="n">model_b</span><span class="p">,</span> <span class="n">test_prompts</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Human eval: How often does model_a beat model_b?&quot;&quot;&quot;</span>
+    <span class="n">wins</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">prompt</span> <span class="ow">in</span> <span class="n">test_prompts</span><span class="p">:</span>
+        <span class="n">response_a</span> <span class="o">=</span> <span class="n">model_a</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+        <span class="n">response_b</span> <span class="o">=</span> <span class="n">model_b</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+
+        <span class="c1"># Ask human: which is better?</span>
+        <span class="k">if</span> <span class="n">human_prefers</span><span class="p">(</span><span class="n">response_a</span><span class="p">,</span> <span class="n">response_b</span><span class="p">):</span>
+            <span class="n">wins</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">wins</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_prompts</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>2. Safety Benchmarks</strong>:
+- TruthfulQA (factuality)
+- BBQ (bias)
+- RealToxicityPrompts (toxicity)</p>
+<p><strong>3. Capability Benchmarks</strong>:
+- MMLU (knowledge)
+- HumanEval (coding)
+- GSM8K (math)</p>
+<hr />
+<h2 id="advanced-constitutional-ai">Advanced: Constitutional AI</h2>
+<p><strong>Anthropic's approach</strong>: Use AI feedback instead of human feedback.</p>
+<p><strong>Process</strong>:
+1. Generate responses
+2. AI critiques based on "constitution" (principles)
+3. AI revises responses
+4. Train reward model on AI preferences</p>
+<p><strong>Advantages</strong>:
+- Scalable (no human labeling bottleneck)
+- Consistent (AI applies principles uniformly)
+- Iterative (easy to update constitution)</p>
+<p><strong>Implementation</strong>:
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">constitutional_ai_revision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">principle</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Critique and revise based on constitutional principle</span>
+
+<span class="sd">    Principle: &quot;Responses should be harmless and avoid stereotypes&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Generate critique</span>
+    <span class="n">critique_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    Response: </span><span class="si">{</span><span class="n">response</span><span class="si">}</span>
+<span class="s2">    Principle: </span><span class="si">{</span><span class="n">principle</span><span class="si">}</span>
+
+<span class="s2">    Does this response violate the principle? If so, how?</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">critique</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">critique_prompt</span><span class="p">)</span>
+
+    <span class="c1"># Generate revision</span>
+    <span class="n">revision_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    Original: </span><span class="si">{</span><span class="n">response</span><span class="si">}</span>
+<span class="s2">    Critique: </span><span class="si">{</span><span class="n">critique</span><span class="si">}</span>
+<span class="s2">    Principle: </span><span class="si">{</span><span class="n">principle</span><span class="si">}</span>
+
+<span class="s2">    Revise the response to align with the principle:</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">revision</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">revision_prompt</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">revision</span>
+</code></pre></div></p>
+<p>See my <a href="https://github.com/DJ92/ai-research-portfolio/tree/main/06-constitutional-ai">Constitutional AI project</a> for full implementation.</p>
+<hr />
+<h2 id="production-considerations">Production Considerations</h2>
+<p><strong>Compute Costs</strong>:
+- <strong>RLHF</strong>: 2-3× more expensive than SFT (3 models + sampling)
+- <strong>DPO</strong>: Similar to SFT (offline training)</p>
+<p><strong>Data Requirements</strong>:
+- <strong>Minimum</strong>: 10k preference pairs
+- <strong>Good</strong>: 100k preference pairs
+- <strong>SOTA</strong>: 1M+ preference pairs (GPT-4)</p>
+<p><strong>Iteration Speed</strong>:
+- SFT: 1-2 days
+- RLHF: 1-2 weeks (reward model + PPO tuning)
+- DPO: 2-3 days</p>
+<hr />
+<h2 id="key-takeaways">Key Takeaways</h2>
+<ol>
+<li><strong>Three stages</strong>: Pre-training → SFT → Preference Alignment</li>
+<li><strong>SFT</strong>: Teach instruction following with (prompt, response) pairs</li>
+<li><strong>RLHF</strong>: Train reward model, optimize with PPO, complex but effective</li>
+<li><strong>DPO</strong>: Direct optimization, simpler and more stable</li>
+<li><strong>KL penalty</strong>: Prevents drift from SFT model</li>
+<li><strong>β parameter</strong>: Controls exploration vs exploitation</li>
+<li><strong>Modern trend</strong>: DPO winning for open-source due to simplicity</li>
+<li><strong>Constitutional AI</strong>: Scale alignment with AI feedback</li>
+</ol>
+<hr />
+<h2 id="further-reading">Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2203.02155">Training language models to follow instructions with human feedback (InstructGPT)</a></li>
+<li><a href="https://arxiv.org/abs/2305.18290">Direct Preference Optimization: Your Language Model is Secretly a Reward Model</a></li>
+<li><a href="https://arxiv.org/abs/2212.08073">Constitutional AI: Harmlessness from AI Feedback</a></li>
+<li><a href="https://github.com/DJ92/ai-research-portfolio/tree/main/11-post-training-methods">GitHub: Post-Training Implementation</a></li>
+<li><a href="https://github.com/DJ92/ai-research-portfolio/tree/main/06-constitutional-ai">GitHub: Constitutional AI Implementation</a></li>
+</ul>
+<hr />
+<p><em>Part of my <a href="https://github.com/DJ92/ai-research-portfolio">AI Research Portfolio</a> - implementing alignment techniques from scratch to understand how LLMs become helpful assistants.</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

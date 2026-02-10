@@ -1,0 +1,1581 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Notes on ML systems, applied ML, and GenAI">
+      
+      
+        <meta name="author" content="Dheeraj Joshi">
+      
+      
+        <link rel="canonical" href="https://dj92.github.io/interview-notes/notes/long-context-llms/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Long Context LLMs: Memory vs Retrieval - DJ | ML Systems & GenAI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#long-context-llms-memory-vs-retrieval" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="DJ | ML Systems &amp; GenAI" class="md-header__button md-logo" aria-label="DJ | ML Systems & GenAI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DJ | ML Systems & GenAI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Long Context LLMs: Memory vs Retrieval
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../about/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  About
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../cloud-cheatsheet/" class="md-tabs__link">
+          
+  
+  
+  Notes
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="DJ | ML Systems &amp; GenAI" class="md-nav__button md-logo" aria-label="DJ | ML Systems & GenAI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DJ | ML Systems & GenAI
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Notes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud-cheatsheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Cheatsheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mlflow-cloud-run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../onnx-java-serving/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ONNX Java Serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../zsh-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zsh Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ai-sdlc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI SDLC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-long-context-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Long Context Problem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#approach-1-retrieval-augmented-generation-rag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Approach 1: Retrieval-Augmented Generation (RAG)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Approach 1: Retrieval-Augmented Generation (RAG)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advantages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disadvantages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disadvantages
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#approach-2-long-context-llms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Approach 2: Long Context LLMs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Approach 2: Long Context LLMs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advantages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disadvantages_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disadvantages
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-lost-in-the-middle-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The "Lost in the Middle" Problem
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The &#34;Lost in the Middle&#34; Problem">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#experiment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Experiment
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#approach-3-hybrid-best-of-both-worlds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Approach 3: Hybrid (Best of Both Worlds)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Approach 3: Hybrid (Best of Both Worlds)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-hybrid-wins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When Hybrid Wins
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-framework-which-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Framework: Which Approach?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Framework: Which Approach?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#use-rag-when" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use RAG when:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-long-context-when" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Long Context when:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-hybrid-when" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Hybrid when:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-1-hierarchical-retrieval-long-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 1: Hierarchical Retrieval + Long Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-2-iterative-retrieval-context-expansion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 2: Iterative Retrieval + Context Expansion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-3-summarization-pyramid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 3: Summarization Pyramid
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cost-performance-trade-offs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost-Performance Trade-offs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cost-Performance Trade-offs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scenario-500k-token-document-10k-queriesday" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario: 500k token document, 10k queries/day
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimizations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Optimizations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-rag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For RAG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-long-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For Long Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-directions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Directions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Future Directions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-sparse-attention-mechanisms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Sparse Attention Mechanisms
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-retrieval-interleaved-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Retrieval-Interleaved Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-external-memory-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. External Memory Systems
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-infinite-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Infinite Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#production-recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Production Recommendations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="long-context-llms-memory-vs-retrieval">Long Context LLMs: Memory vs Retrieval</h1>
+<blockquote>
+<p>How do we handle conversations and documents that exceed context windows? Two approaches dominate.</p>
+</blockquote>
+<p>Modern LLMs have expanding context windows (GPT-4 Turbo: 128k, Claude 3: 200k, Gemini 1.5: 1M tokens), but naive approaches fail at scale. This post explores when to use retrieval vs when to leverage long context directly.</p>
+<h2 id="the-long-context-problem">The Long Context Problem</h2>
+<p><strong>Scenario</strong>: User wants to chat with a 500-page technical manual (≈500k tokens).</p>
+<p><strong>Challenge</strong>: How do we make this work?</p>
+<p><strong>Options</strong>:
+1. <strong>Retrieval-Augmented Generation (RAG)</strong>: Retrieve relevant chunks, feed to LLM
+2. <strong>Long Context</strong>: Feed entire document into 1M token context window
+3. <strong>Hybrid</strong>: Combine both approaches</p>
+<p>Let's explore the trade-offs.</p>
+<hr />
+<h2 id="approach-1-retrieval-augmented-generation-rag">Approach 1: Retrieval-Augmented Generation (RAG)</h2>
+<p><strong>Strategy</strong>: Retrieve only relevant sections, pass to LLM.</p>
+<h3 id="architecture">Architecture</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rag_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">document_chunks</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    RAG: Retrieve then generate</span>
+
+<span class="sd">    Context usage: ~5k tokens (top-k chunks)</span>
+<span class="sd">    Cost: Low ($0.01 per query)</span>
+<span class="sd">    Latency: Medium (retrieval + generation)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 1. Embed query</span>
+    <span class="n">query_embedding</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+    <span class="c1"># 2. Retrieve top-k relevant chunks</span>
+    <span class="n">relevant_chunks</span> <span class="o">=</span> <span class="n">vector_db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+        <span class="n">query_embedding</span><span class="p">,</span>
+        <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span>
+    <span class="p">)</span>
+
+    <span class="c1"># 3. Generate with retrieved context</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">chunk</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">relevant_chunks</span><span class="p">])</span>
+
+    <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    Context:</span>
+<span class="s2">    </span><span class="si">{</span><span class="n">context</span><span class="si">}</span>
+
+<span class="s2">    Question: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span>
+
+<span class="s2">    Answer based only on the context above:</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="advantages">Advantages</h3>
+<p>✅ <strong>Cost-effective</strong>: Only process small context
+- 5k tokens vs 500k tokens (100× cheaper)
+- Example: $0.01 vs $1.00 per query</p>
+<p>✅ <strong>Fast</strong>: Minimal latency
+- Retrieval: ~50ms (FAISS/Chroma)
+- Generation: ~1s (5k context)
+- Total: ~1.05s</p>
+<p>✅ <strong>Scalable</strong>: Works for unlimited document sizes
+- 1GB PDF? Same cost as 1MB PDF
+- Just add more chunks to vector DB</p>
+<p>✅ <strong>Dynamic updates</strong>: Easy to add/remove content
+- Add new documents without reprocessing entire corpus</p>
+<h3 id="disadvantages">Disadvantages</h3>
+<p>❌ <strong>Lossy</strong>: Might miss important context
+- Top-k retrieval might not capture everything
+- Cross-reference information gets lost</p>
+<p>❌ <strong>Chunking challenges</strong>: How to split optimally?
+- Fixed-size: Breaks semantic units
+- Semantic: More expensive, still imperfect
+- Sentence-level: Loses paragraph context</p>
+<p>❌ <strong>Multi-hop reasoning fails</strong>: Can't connect distant facts
+- "What did the author say about X in Chapter 2 vs Chapter 10?"
+- Retrieval might get Chapter 2 or 10, but not both</p>
+<p>❌ <strong>Ordering matters</strong>: Chronological queries break
+- "How did the methodology evolve throughout the paper?"
+- Chunks lose temporal structure</p>
+<hr />
+<h2 id="approach-2-long-context-llms">Approach 2: Long Context LLMs</h2>
+<p><strong>Strategy</strong>: Feed entire document into context window.</p>
+<h3 id="architecture_1">Architecture</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">long_context_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">full_document</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Long context: Process entire document</span>
+
+<span class="sd">    Context usage: ~500k tokens (full doc)</span>
+<span class="sd">    Cost: High ($1.00 per query)</span>
+<span class="sd">    Latency: High (500k token processing)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    Document:</span>
+<span class="s2">    </span><span class="si">{</span><span class="n">full_document</span><span class="si">}</span>
+
+<span class="s2">    Question: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span>
+
+<span class="s2">    Answer based on the document above:</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="n">prompt</span><span class="p">,</span>
+        <span class="n">max_context</span><span class="o">=</span><span class="mi">1000000</span>  <span class="c1"># 1M token window</span>
+    <span class="p">)</span>
+</code></pre></div>
+<h3 id="advantages_1">Advantages</h3>
+<p>✅ <strong>No information loss</strong>: Entire document available
+- Model sees everything
+- Cross-references preserved
+- Chronological order maintained</p>
+<p>✅ <strong>Multi-hop reasoning works</strong>: Can connect distant facts
+- "Compare methodology in Chapter 2 vs Chapter 10" ✓
+- Model can traverse entire document</p>
+<p>✅ <strong>Simpler architecture</strong>: No chunking, no retrieval
+- Just prompt engineering
+- Fewer moving parts</p>
+<p>✅ <strong>Better for summarization</strong>: Holistic view
+- "Summarize key themes across the entire book"
+- Model has global context</p>
+<h3 id="disadvantages_1">Disadvantages</h3>
+<p>❌ <strong>Expensive</strong>: Linear cost with document size
+- 500k tokens @ $0.002/1k = $1.00 per query
+- 100× more expensive than RAG</p>
+<p>❌ <strong>Slow</strong>: Processing time scales with length
+- 500k tokens ≈ 30-60s latency
+- User experience suffers</p>
+<p>❌ <strong>Attention dilution</strong>: "Lost in the middle" problem
+- Models perform worse on middle sections
+- Attention spreads thin over long contexts</p>
+<p>❌ <strong>Hard limits</strong>: Still bounded by context window
+- 1M tokens ≈ 750k words ≈ 3,000 pages
+- What about larger corpora?</p>
+<hr />
+<h2 id="the-lost-in-the-middle-problem">The "Lost in the Middle" Problem</h2>
+<p><strong>Research finding</strong>: LLMs struggle with information in the middle of long contexts.</p>
+<h3 id="experiment">Experiment</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_retrieval_position</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">context_length</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Insert key fact at different positions in long context</span>
+<span class="sd">    Test if model can retrieve it</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">positions</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>  <span class="c1"># start, 25%, 50%, 75%, end</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">position</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">:</span>
+        <span class="c1"># Insert fact at position</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="n">create_context_with_fact_at</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">context_length</span><span class="p">)</span>
+
+        <span class="c1"># Ask model to retrieve fact</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">context</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">Question: What was the key fact?&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Evaluate accuracy</span>
+        <span class="n">results</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="n">check_accuracy</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results</span>
+
+<span class="c1"># Typical results (GPT-4 Turbo, 100k context):</span>
+<span class="c1"># Position 0.0 (start):  95% accuracy</span>
+<span class="c1"># Position 0.25:         85% accuracy</span>
+<span class="c1"># Position 0.5 (middle): 60% accuracy  ← Lost in the middle!</span>
+<span class="c1"># Position 0.75:         85% accuracy</span>
+<span class="c1"># Position 1.0 (end):    95% accuracy</span>
+</code></pre></div>
+<p><strong>Implication</strong>: Even with long context, middle information gets "lost".</p>
+<p><strong>Mitigation</strong>:
+- Put important info at start or end of prompt
+- Use retrieval to surface key facts to top
+- Hierarchical summarization</p>
+<hr />
+<h2 id="approach-3-hybrid-best-of-both-worlds">Approach 3: Hybrid (Best of Both Worlds)</h2>
+<p><strong>Strategy</strong>: Use retrieval to filter, then leverage long context for reasoning.</p>
+<h3 id="architecture_2">Architecture</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">hybrid_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">document_chunks</span><span class="p">,</span> <span class="n">context_budget</span><span class="o">=</span><span class="mi">100000</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Hybrid: Retrieve broader context, use long-context reasoning</span>
+
+<span class="sd">    Context usage: ~100k tokens (top-20 chunks)</span>
+<span class="sd">    Cost: Medium ($0.20 per query)</span>
+<span class="sd">    Latency: Medium-High (retrieval + long context)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 1. Retrieve top-20 chunks (broader than RAG)</span>
+    <span class="n">query_embedding</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="n">relevant_chunks</span> <span class="o">=</span> <span class="n">vector_db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+        <span class="n">query_embedding</span><span class="p">,</span>
+        <span class="n">top_k</span><span class="o">=</span><span class="mi">20</span>  <span class="c1"># More chunks than pure RAG</span>
+    <span class="p">)</span>
+
+    <span class="c1"># 2. Include surrounding context for each chunk</span>
+    <span class="n">expanded_chunks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">relevant_chunks</span><span class="p">:</span>
+        <span class="c1"># Get ±2 chunks around each retrieved chunk</span>
+        <span class="n">surrounding</span> <span class="o">=</span> <span class="n">get_surrounding_chunks</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">expanded_chunks</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">surrounding</span><span class="p">)</span>
+
+    <span class="c1"># 3. Deduplicate and assemble</span>
+    <span class="n">unique_chunks</span> <span class="o">=</span> <span class="n">deduplicate</span><span class="p">(</span><span class="n">expanded_chunks</span><span class="p">)</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">assemble_with_structure</span><span class="p">(</span><span class="n">unique_chunks</span><span class="p">)</span>
+
+    <span class="c1"># 4. Use long context LLM for reasoning</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    Relevant sections from document:</span>
+<span class="s2">    </span><span class="si">{</span><span class="n">context</span><span class="si">}</span>
+
+<span class="s2">    Question: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span>
+
+<span class="s2">    Answer based on the sections above. You may need to connect</span>
+<span class="s2">    information across multiple sections.</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">max_context</span><span class="o">=</span><span class="mi">200000</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="when-hybrid-wins">When Hybrid Wins</h3>
+<p><strong>Use case 1: Multi-hop questions</strong>
+- Query: "How did the author's views on X evolve from Chapter 1 to Chapter 10?"
+- Retrieval: Get both chapters
+- Long context: Reason across them</p>
+<p><strong>Use case 2: Comparison queries</strong>
+- Query: "Compare approach A vs approach B"
+- Retrieval: Get both approaches
+- Long context: Detailed comparison</p>
+<p><strong>Use case 3: Evidence gathering</strong>
+- Query: "Find all mentions of X and summarize the key takeaways"
+- Retrieval: Get all relevant sections
+- Long context: Synthesize across them</p>
+<hr />
+<h2 id="decision-framework-which-approach">Decision Framework: Which Approach?</h2>
+<h3 id="use-rag-when">Use RAG when:</h3>
+<p>✅ <strong>Cost-sensitive applications</strong>
+- High query volume (1M+ queries/day)
+- Budget constraints</p>
+<p>✅ <strong>Simple lookup queries</strong>
+- "What is the definition of X?"
+- "When was Y published?"
+- Single-hop reasoning</p>
+<p>✅ <strong>Extremely large corpora</strong>
+- 10,000+ documents
+- Multi-TB knowledge bases</p>
+<p>✅ <strong>Low-latency requirements</strong>
+- Chatbots with &lt;2s response time
+- Real-time applications</p>
+<p>✅ <strong>Dynamic content</strong>
+- Frequently updated documents
+- Need to add/remove content easily</p>
+<h3 id="use-long-context-when">Use Long Context when:</h3>
+<p>✅ <strong>Complex reasoning required</strong>
+- Multi-hop questions
+- Comparative analysis
+- Temporal reasoning</p>
+<p>✅ <strong>High accuracy critical</strong>
+- Cannot afford to miss information
+- Medical, legal, scientific domains</p>
+<p>✅ <strong>Small document sets</strong>
+- Single large document (book, manual, thesis)
+- &lt;100k tokens total</p>
+<p>✅ <strong>Cost not a constraint</strong>
+- Research projects
+- High-value use cases</p>
+<h3 id="use-hybrid-when">Use Hybrid when:</h3>
+<p>✅ <strong>Medium complexity</strong>
+- More than simple lookup, less than full analysis
+- Need both retrieval efficiency + reasoning power</p>
+<p>✅ <strong>Moderate document sizes</strong>
+- 100k - 1M tokens
+- Sweet spot for hybrid</p>
+<p>✅ <strong>Quality &gt; cost (but cost matters)</strong>
+- Willing to pay 10× more than RAG
+- But not 100× more for full long context</p>
+<hr />
+<h2 id="implementation-patterns">Implementation Patterns</h2>
+<h3 id="pattern-1-hierarchical-retrieval-long-context">Pattern 1: Hierarchical Retrieval + Long Context</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">hierarchical_hybrid</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">documents</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Step 1: Retrieve relevant documents (coarse)</span>
+<span class="sd">    Step 2: Use long context within those documents (fine)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Coarse: Which documents?</span>
+    <span class="n">relevant_docs</span> <span class="o">=</span> <span class="n">retrieve_documents</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1"># Fine: Long context reasoning within them</span>
+    <span class="n">combined_docs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">---</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">relevant_docs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Documents:</span><span class="se">\n</span><span class="si">{</span><span class="n">combined_docs</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">Question: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">max_context</span><span class="o">=</span><span class="mi">200000</span>
+    <span class="p">)</span>
+</code></pre></div>
+<h3 id="pattern-2-iterative-retrieval-context-expansion">Pattern 2: Iterative Retrieval + Context Expansion</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">iterative_expansion</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">vector_db</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Iteratively expand context until sufficient information found</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">context_chunks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current_query</span> <span class="o">=</span> <span class="n">query</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iterations</span><span class="p">):</span>
+        <span class="c1"># Retrieve based on current query</span>
+        <span class="n">new_chunks</span> <span class="o">=</span> <span class="n">vector_db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">current_query</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">context_chunks</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">new_chunks</span><span class="p">)</span>
+
+        <span class="c1"># Generate intermediate answer</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="n">assemble</span><span class="p">(</span><span class="n">context_chunks</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Context: </span><span class="si">{</span><span class="n">context</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">Question: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;If you need more information, say &#39;NEED_MORE: &lt;what info&gt;&#39;.&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Check if model needs more info</span>
+        <span class="k">if</span> <span class="s2">&quot;NEED_MORE:&quot;</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+            <span class="n">current_query</span> <span class="o">=</span> <span class="n">extract_info_need</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">response</span>  <span class="c1"># Done!</span>
+
+    <span class="k">return</span> <span class="n">response</span>
+</code></pre></div>
+<h3 id="pattern-3-summarization-pyramid">Pattern 3: Summarization Pyramid</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">summarization_pyramid</span><span class="p">(</span><span class="n">large_document</span><span class="p">,</span> <span class="n">max_context</span><span class="o">=</span><span class="mi">100000</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compress long documents via hierarchical summarization</span>
+<span class="sd">    Fit result into long context window</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Level 1: Chunk document</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="n">chunk_document</span><span class="p">(</span><span class="n">large_document</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+
+    <span class="c1"># Level 2: Summarize each chunk</span>
+    <span class="n">summaries</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Summarize:</span><span class="se">\n</span><span class="si">{</span><span class="n">chunk</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunks</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Level 3: Summarize summaries (if needed)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">summaries</span><span class="p">)</span> <span class="o">*</span> <span class="mi">500</span> <span class="o">&gt;</span> <span class="n">max_context</span><span class="p">:</span>
+        <span class="n">summaries</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Summarize these summaries:</span><span class="se">\n</span><span class="si">{</span><span class="n">group</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">(</span><span class="n">summaries</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="p">]</span>
+
+    <span class="c1"># Final: Long context reasoning over compressed representation</span>
+    <span class="n">compressed_doc</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">summaries</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">compressed_doc</span>  <span class="c1"># Can now fit in context window</span>
+</code></pre></div>
+<hr />
+<h2 id="cost-performance-trade-offs">Cost-Performance Trade-offs</h2>
+<h3 id="scenario-500k-token-document-10k-queriesday">Scenario: 500k token document, 10k queries/day</h3>
+<table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Cost/Query</th>
+<th>Total/Day</th>
+<th>Latency</th>
+<th>Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RAG (top-5)</strong></td>
+<td>$0.01</td>
+<td>$100</td>
+<td>1.0s</td>
+<td>75%</td>
+</tr>
+<tr>
+<td><strong>RAG (top-20)</strong></td>
+<td>$0.04</td>
+<td>$400</td>
+<td>1.2s</td>
+<td>85%</td>
+</tr>
+<tr>
+<td><strong>Hybrid</strong></td>
+<td>$0.20</td>
+<td>$2,000</td>
+<td>3.0s</td>
+<td>92%</td>
+</tr>
+<tr>
+<td><strong>Full Long Context</strong></td>
+<td>$1.00</td>
+<td>$10,000</td>
+<td>30s</td>
+<td>95%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Observations</strong>:
+- RAG: 100× cheaper than long context, but 20% accuracy loss
+- Hybrid: 5× cheaper than long context, only 3% accuracy loss
+- Long context: Highest accuracy, but extreme cost + latency</p>
+<p><strong>Recommendation</strong>: Hybrid for most production use cases.</p>
+<hr />
+<h2 id="optimizations">Optimizations</h2>
+<h3 id="for-rag">For RAG</h3>
+<p><strong>1. Query Expansion</strong>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">expand_query</span><span class="p">(</span><span class="n">query</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate multiple query variants for better retrieval&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Generate 3 alternative phrasings of: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">expanded_queries</span> <span class="o">=</span> <span class="n">expand_query</span><span class="p">(</span><span class="n">user_query</span><span class="p">)</span>
+<span class="n">all_chunks</span> <span class="o">=</span> <span class="p">[</span><span class="n">retrieve</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">expanded_queries</span><span class="p">]</span>
+<span class="n">deduplicated</span> <span class="o">=</span> <span class="n">deduplicate</span><span class="p">(</span><span class="n">all_chunks</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>2. Reranking</strong>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rerank</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">chunks</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use cross-encoder to rerank retrieved chunks&quot;&quot;&quot;</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">cross_encoder</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span>
+        <span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">chunk</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunks</span>
+    <span class="p">])</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="n">scores</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>3. Contextual Chunk Embeddings</strong>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">embed_with_context</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">surrounding_chunks</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Embed chunk with surrounding context for better retrieval&quot;&quot;&quot;</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Previous: </span><span class="si">{</span><span class="n">surrounding_chunks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="se">\n\n</span><span class="si">{</span><span class="n">chunk</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">Next: </span><span class="si">{</span><span class="n">surrounding_chunks</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">embed</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</code></pre></div></p>
+<h3 id="for-long-context">For Long Context</h3>
+<p><strong>1. Prompt Positioning</strong>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">position_optimized_prompt</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">document</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Put query at start AND end to avoid &#39;lost in the middle&#39;&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    Question: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span>
+
+<span class="s2">    Document:</span>
+<span class="s2">    </span><span class="si">{</span><span class="n">document</span><span class="si">}</span>
+
+<span class="s2">    Answer the question above based on the document.</span>
+<span class="s2">    Question (reminder): </span><span class="si">{</span><span class="n">query</span><span class="si">}</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+</code></pre></div></p>
+<p><strong>2. Chunked Processing with Memory</strong>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">process_with_memory</span><span class="p">(</span><span class="n">large_doc</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">50000</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process large doc in chunks, maintain running summary&quot;&quot;&quot;</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="n">split</span><span class="p">(</span><span class="n">large_doc</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">)</span>
+    <span class="n">memory</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
+        <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Memory: </span><span class="si">{</span><span class="n">memory</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">New content: </span><span class="si">{</span><span class="n">chunk</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">Update memory:&quot;</span>
+        <span class="n">memory</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">memory</span>  <span class="c1"># Compressed representation</span>
+</code></pre></div></p>
+<hr />
+<h2 id="future-directions">Future Directions</h2>
+<h3 id="1-sparse-attention-mechanisms">1. Sparse Attention Mechanisms</h3>
+<ul>
+<li>Longformer, BigBird: O(n) instead of O(n²)</li>
+<li>Trade accuracy for efficiency</li>
+</ul>
+<h3 id="2-retrieval-interleaved-generation">2. Retrieval-Interleaved Generation</h3>
+<ul>
+<li>Models that retrieve mid-generation</li>
+<li>RETRO, kNN-LM patterns</li>
+</ul>
+<h3 id="3-external-memory-systems">3. External Memory Systems</h3>
+<ul>
+<li>Vector DBs as external memory</li>
+<li>Learn when to retrieve vs use parametric knowledge</li>
+</ul>
+<h3 id="4-infinite-context">4. Infinite Context</h3>
+<ul>
+<li>RMT (Recurrent Memory Transformer)</li>
+<li>Compress arbitrarily long contexts</li>
+</ul>
+<hr />
+<h2 id="key-takeaways">Key Takeaways</h2>
+<ol>
+<li><strong>RAG wins on cost/latency</strong>: 100× cheaper, 10× faster</li>
+<li><strong>Long context wins on accuracy</strong>: No information loss, multi-hop reasoning</li>
+<li><strong>Hybrid is the sweet spot</strong>: 5× cheaper than long context, 95% of the accuracy</li>
+<li><strong>"Lost in the middle" is real</strong>: Position matters in long contexts</li>
+<li><strong>Use case determines approach</strong>: Simple lookup → RAG, complex reasoning → long context</li>
+<li><strong>Optimize retrieval first</strong>: Query expansion, reranking, contextual embeddings</li>
+<li><strong>Context budgets matter</strong>: Track tokens like you track dollars</li>
+</ol>
+<hr />
+<h2 id="production-recommendations">Production Recommendations</h2>
+<p><strong>Start with</strong>: Hybrid approach (retrieval + moderate long context)</p>
+<p><strong>Optimize for</strong>:
+- Cost: Aggressive retrieval filtering, smaller top-k
+- Latency: Parallel retrieval, streaming generation
+- Quality: Larger context budgets, reranking</p>
+<p><strong>Monitor</strong>:
+- Query complexity distribution (simple vs multi-hop)
+- Retrieval quality (precision@k, recall@k)
+- Cost per query (track context usage)
+- User satisfaction (thumbs up/down)</p>
+<p><strong>Iterate</strong>:
+- A/B test RAG vs hybrid vs long context
+- Tune retrieval parameters (top-k, reranking threshold)
+- Adjust context budgets based on query type</p>
+<hr />
+<h2 id="further-reading">Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2307.03172">Lost in the Middle: How Language Models Use Long Contexts</a></li>
+<li><a href="https://arxiv.org/abs/2312.10997">Retrieval-Augmented Generation for Large Language Models: A Survey</a></li>
+<li><a href="https://arxiv.org/abs/2402.02244">Long-Context LLMs: A Survey</a></li>
+<li><a href="https://github.com/DJ92/ai-research-portfolio/tree/main/03-rag-system">GitHub: Production RAG Implementation</a></li>
+</ul>
+<hr />
+<p><em>Part of my <a href="https://dj92.github.io/interview-notes">technical blog</a> exploring practical AI engineering. See my <a href="https://github.com/DJ92/ai-research-portfolio">AI Research Portfolio</a> for implementations.</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1286 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Notes on ML systems, applied ML, and GenAI">
+      
+      
+        <meta name="author" content="Dheeraj Joshi">
+      
+      
+        <link rel="canonical" href="https://dj92.github.io/interview-notes/notes/cloud-cheatsheet/">
+      
+      
+        <link rel="prev" href="../../about/">
+      
+      
+        <link rel="next" href="../mlflow-cloud-run/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Cloud Cheatsheet - DJ | ML Systems & GenAI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#cloud-service-cheatsheet" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="DJ | ML Systems &amp; GenAI" class="md-header__button md-logo" aria-label="DJ | ML Systems & GenAI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DJ | ML Systems & GenAI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Cloud Cheatsheet
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../about/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  About
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Notes
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="DJ | ML Systems &amp; GenAI" class="md-nav__button md-logo" aria-label="DJ | ML Systems & GenAI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DJ | ML Systems & GenAI
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Notes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Cheatsheet
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Cheatsheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#gcp-vs-aws-vs-azure-interview-system-design-oriented" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GCP vs AWS vs Azure (Interview &amp; System Design Oriented)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compute
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Storage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#databases-data-platforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Databases &amp; Data Platforms
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#messaging-streaming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Messaging &amp; Streaming
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#networking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Networking
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observability-reliability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observability &amp; Reliability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ml-mlops-platforms-critical-for-mle-interviews" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ML &amp; MLOps Platforms (Critical for MLE Interviews)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-i-reason-across-clouds-interview-framing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How I Reason Across Clouds (Interview Framing)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cloud-selection-heuristics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cloud Selection Heuristics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-mental-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR Mental Model
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mlflow-cloud-run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../onnx-java-serving/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ONNX Java Serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../zsh-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zsh Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ai-sdlc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI SDLC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#gcp-vs-aws-vs-azure-interview-system-design-oriented" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GCP vs AWS vs Azure (Interview &amp; System Design Oriented)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compute
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Storage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#databases-data-platforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Databases &amp; Data Platforms
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#messaging-streaming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Messaging &amp; Streaming
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#networking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Networking
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observability-reliability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observability &amp; Reliability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ml-mlops-platforms-critical-for-mle-interviews" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ML &amp; MLOps Platforms (Critical for MLE Interviews)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-i-reason-across-clouds-interview-framing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How I Reason Across Clouds (Interview Framing)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cloud-selection-heuristics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cloud Selection Heuristics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-mental-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR Mental Model
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="cloud-service-cheatsheet">Cloud Service Cheatsheet</h1>
+<h3 id="gcp-vs-aws-vs-azure-interview-system-design-oriented">GCP vs AWS vs Azure (Interview &amp; System Design Oriented)</h3>
+<p>This cheatsheet maps core cloud primitives across <strong>GCP, AWS, and Azure</strong>, with an emphasis on <strong>ML systems, data platforms, and production workloads</strong>.</p>
+<p>The goal is not memorizing names, but understanding <strong>equivalent building blocks and trade-offs</strong>.</p>
+<hr />
+<h2 id="compute">Compute</h2>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>GCP</th>
+<th>AWS</th>
+<th>Azure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Virtual Machines</td>
+<td>Compute Engine</td>
+<td>EC2</td>
+<td>Virtual Machines</td>
+</tr>
+<tr>
+<td>Autoscaling</td>
+<td>Managed Instance Groups</td>
+<td>Auto Scaling Groups</td>
+<td>VM Scale Sets</td>
+</tr>
+<tr>
+<td>Containers (Managed)</td>
+<td>GKE</td>
+<td>EKS / ECS</td>
+<td>AKS</td>
+</tr>
+<tr>
+<td>Serverless (HTTP)</td>
+<td>Cloud Run</td>
+<td>Lambda</td>
+<td>Azure Functions</td>
+</tr>
+<tr>
+<td>Batch Jobs</td>
+<td>Batch / Dataflow</td>
+<td>Batch</td>
+<td>Azure Batch</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Interview tip:</strong><br />
+Serverless = fast iteration, bursty workloads<br />
+VMs / K8s = predictable latency, long-running services</p>
+<hr />
+<h2 id="storage">Storage</h2>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>GCP</th>
+<th>AWS</th>
+<th>Azure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Object Storage</td>
+<td>Cloud Storage</td>
+<td>S3</td>
+<td>Blob Storage</td>
+</tr>
+<tr>
+<td>Block Storage</td>
+<td>Persistent Disk</td>
+<td>EBS</td>
+<td>Managed Disks</td>
+</tr>
+<tr>
+<td>File Storage</td>
+<td>Filestore</td>
+<td>EFS</td>
+<td>Azure Files</td>
+</tr>
+</tbody>
+</table>
+<p><strong>ML usage notes</strong>
+- Object storage for datasets, checkpoints, artifacts
+- Block storage for low-latency model serving
+- File storage mostly for legacy or shared workloads</p>
+<hr />
+<h2 id="databases-data-platforms">Databases &amp; Data Platforms</h2>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>GCP</th>
+<th>AWS</th>
+<th>Azure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Managed SQL</td>
+<td>Cloud SQL</td>
+<td>RDS</td>
+<td>Azure SQL</td>
+</tr>
+<tr>
+<td>Globally Scalable SQL</td>
+<td>Spanner</td>
+<td>Aurora</td>
+<td>Cosmos DB</td>
+</tr>
+<tr>
+<td>NoSQL (Wide Column / KV)</td>
+<td>Bigtable</td>
+<td>DynamoDB</td>
+<td>Cosmos DB</td>
+</tr>
+<tr>
+<td>Cache</td>
+<td>Memorystore</td>
+<td>ElastiCache</td>
+<td>Azure Cache for Redis</td>
+</tr>
+<tr>
+<td>Data Warehouse</td>
+<td>BigQuery</td>
+<td>Redshift</td>
+<td>Synapse</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Design signal:</strong><br />
+- OLTP ≠ Analytics<br />
+- BigQuery / Redshift / Synapse are <strong>not</strong> serving databases</p>
+<hr />
+<h2 id="messaging-streaming">Messaging &amp; Streaming</h2>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>GCP</th>
+<th>AWS</th>
+<th>Azure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pub/Sub (Eventing)</td>
+<td>Pub/Sub</td>
+<td>SNS / SQS</td>
+<td>Service Bus</td>
+</tr>
+<tr>
+<td>Streaming</td>
+<td>Pub/Sub</td>
+<td>Kinesis</td>
+<td>Event Hubs</td>
+</tr>
+<tr>
+<td>Workflow Orchestration</td>
+<td>Cloud Composer</td>
+<td>Step Functions</td>
+<td>Logic Apps</td>
+</tr>
+</tbody>
+</table>
+<p><strong>ML relevance</strong>
+- Event-driven feature updates
+- Training triggers
+- Async inference workflows</p>
+<hr />
+<h2 id="networking">Networking</h2>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>GCP</th>
+<th>AWS</th>
+<th>Azure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Virtual Network</td>
+<td>VPC</td>
+<td>VPC</td>
+<td>VNet</td>
+</tr>
+<tr>
+<td>Load Balancer</td>
+<td>Cloud Load Balancing</td>
+<td>ALB / NLB</td>
+<td>Azure Load Balancer</td>
+</tr>
+<tr>
+<td>DNS</td>
+<td>Cloud DNS</td>
+<td>Route 53</td>
+<td>Azure DNS</td>
+</tr>
+<tr>
+<td>CDN</td>
+<td>Cloud CDN</td>
+<td>CloudFront</td>
+<td>Azure CDN</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Interview note:</strong><br />
+Talk in terms of <strong>L4 vs L7</strong>, not product names.</p>
+<hr />
+<h2 id="observability-reliability">Observability &amp; Reliability</h2>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>GCP</th>
+<th>AWS</th>
+<th>Azure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Logging</td>
+<td>Cloud Logging</td>
+<td>CloudWatch Logs</td>
+<td>Azure Monitor</td>
+</tr>
+<tr>
+<td>Metrics</td>
+<td>Cloud Monitoring</td>
+<td>CloudWatch Metrics</td>
+<td>Azure Monitor</td>
+</tr>
+<tr>
+<td>Tracing</td>
+<td>Cloud Trace</td>
+<td>X-Ray</td>
+<td>Application Insights</td>
+</tr>
+<tr>
+<td>Alerts</td>
+<td>Alerting Policies</td>
+<td>CloudWatch Alarms</td>
+<td>Alerts</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Senior signal:</strong><br />
+Observability is a <strong>first-class system requirement</strong>, not an afterthought.</p>
+<hr />
+<h2 id="ml-mlops-platforms-critical-for-mle-interviews">ML &amp; MLOps Platforms (Critical for MLE Interviews)</h2>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>GCP</th>
+<th>AWS</th>
+<th>Azure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ML Platform</td>
+<td>Vertex AI</td>
+<td>SageMaker</td>
+<td>Azure ML</td>
+</tr>
+<tr>
+<td>Training Jobs</td>
+<td>Vertex Training</td>
+<td>SageMaker Training</td>
+<td>Azure ML Jobs</td>
+</tr>
+<tr>
+<td>Feature Store</td>
+<td>Vertex Feature Store</td>
+<td>SageMaker Feature Store</td>
+<td>Azure Feature Store</td>
+</tr>
+<tr>
+<td>Pipelines</td>
+<td>Vertex Pipelines</td>
+<td>SageMaker Pipelines</td>
+<td>Azure ML Pipelines</td>
+</tr>
+<tr>
+<td>Model Registry</td>
+<td>Vertex Model Registry</td>
+<td>SageMaker Registry</td>
+<td>Azure ML Registry</td>
+</tr>
+<tr>
+<td>Online Serving</td>
+<td>Vertex Endpoints</td>
+<td>SageMaker Endpoints</td>
+<td>Azure Online Endpoints</td>
+</tr>
+<tr>
+<td>Monitoring</td>
+<td>Vertex Model Monitoring</td>
+<td>SageMaker Model Monitor</td>
+<td>Azure ML Monitoring</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key interview insight:</strong><br />
+Most ML failures come from <strong>data + serving</strong>, not modeling.</p>
+<hr />
+<h2 id="how-i-reason-across-clouds-interview-framing">How I Reason Across Clouds (Interview Framing)</h2>
+<p>Instead of saying:</p>
+<blockquote>
+<p>“I’d use BigQuery”</p>
+</blockquote>
+<p>Say:</p>
+<blockquote>
+<p>“I’d use a managed columnar data warehouse (BigQuery / Redshift) optimized for analytical queries.”</p>
+</blockquote>
+<p>Instead of:</p>
+<blockquote>
+<p>“We use SageMaker”</p>
+</blockquote>
+<p>Say:</p>
+<blockquote>
+<p>“We use a managed ML platform for training, registry, deployment, and monitoring.”</p>
+</blockquote>
+<hr />
+<h2 id="cloud-selection-heuristics">Cloud Selection Heuristics</h2>
+<ul>
+<li><strong>GCP:</strong> Strongest for analytics &amp; ML-native workflows  </li>
+<li><strong>AWS:</strong> Broadest ecosystem, best for infra-heavy systems  </li>
+<li><strong>Azure:</strong> Strong enterprise integration, identity-first</li>
+</ul>
+<p>In interviews, emphasize <strong>trade-offs</strong>, not preferences.</p>
+<hr />
+<h2 id="tldr-mental-model">TL;DR Mental Model</h2>
+<p>All clouds provide the same primitives:</p>
+<blockquote>
+<p><strong>Compute · Storage · Network · Data · ML · Observability</strong></p>
+</blockquote>
+<p>If you can reason at that level, service names are just details.</p>
+<hr />
+<p><em>This cheatsheet is intended for ML system design interviews and real-world architecture discussions.</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

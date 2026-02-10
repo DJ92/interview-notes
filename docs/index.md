@@ -20,6 +20,7 @@ Deep dives into transformer architectures, training, and alignment techniques.
 - **[LLM Pre-training](notes/llm-pretraining.md)**: CLM vs MLM objectives, training dynamics, warmup schedules, and scaling laws.
 - **[Alignment: RLHF vs DPO](notes/alignment-rlhf-dpo.md)**: How LLMs learn to be helpful - reward modeling, PPO, and direct preference optimization.
 - **[Parameter-Efficient Fine-Tuning](notes/peft-lora-quantization.md)**: LoRA, quantization (4-bit/8-bit), and QLoRA for efficient fine-tuning.
+- **[Long Context LLMs](notes/long-context-llms.md)**: Memory vs retrieval trade-offs, hybrid approaches, and the "lost in the middle" problem.
 - **[LLM Evaluation](notes/llm-evaluation.md)**: Beyond BLEU scores - automated metrics, LLM-as-judge, and production patterns.
 
 ## ⚙️ Machine Learning Systems

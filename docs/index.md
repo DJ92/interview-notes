@@ -12,6 +12,16 @@ Standardizing how we build software with AI agents.
 
 - **[AI SDLC](notes/ai-sdlc.md)**: A framework for **Context-as-Code** (`.cursor/rules`, Skills, PRDs) and **MCP** integration to build consistent, high-quality software with agents.
 
+## 🔬 LLM Foundations & Research
+
+Deep dives into transformer architectures, training, and alignment techniques.
+
+- **[Transformer Architecture](notes/transformer-architecture.md)**: From attention mechanisms to GPT - understanding self-attention, positional encodings, and modern variants (RoPE).
+- **[LLM Pre-training](notes/llm-pretraining.md)**: CLM vs MLM objectives, training dynamics, warmup schedules, and scaling laws.
+- **[Alignment: RLHF vs DPO](notes/alignment-rlhf-dpo.md)**: How LLMs learn to be helpful - reward modeling, PPO, and direct preference optimization.
+- **[Parameter-Efficient Fine-Tuning](notes/peft-lora-quantization.md)**: LoRA, quantization (4-bit/8-bit), and QLoRA for efficient fine-tuning.
+- **[LLM Evaluation](notes/llm-evaluation.md)**: Beyond BLEU scores - automated metrics, LLM-as-judge, and production patterns.
+
 ## ⚙️ Machine Learning Systems
 
 Productionalizing ML models is harder than training them.
